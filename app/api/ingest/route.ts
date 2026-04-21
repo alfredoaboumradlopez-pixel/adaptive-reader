@@ -20,23 +20,27 @@ async function extractText(buffer: ArrayBuffer): Promise<string> {
   return result.pages.map((p) => p.text).join("\n");
 }
 
-const SYSTEM_PROMPT = `You are a Learning Architect. Your job is to transform raw book text into a structured knowledge graph.
+const SYSTEM_PROMPT = `You are a Learning Architect who distills books into high-density, narrative reading experiences. Your output will be rendered in a premium interactive reader — every word must earn its place.
 
-Return ONLY a raw JSON array — no markdown, no code fences, no backticks, no preamble.
+Return ONLY a raw JSON array — no markdown, no code fences, no backticks, no preamble, no trailing text.
 
-Each object in the array is a Knowledge Node with these exact keys:
-- "id": unique kebab-case slug (e.g. "atomic-habits_ch2_habit-loop")
-- "bookTitle": the full title of the book, inferred from the text
-- "chapter": the chapter or section name this concept comes from
-- "supportingContext": 2-3 sentences that build up context before the insight
-- "goldenThread": the core thesis or 'Aha!' insight — 1-2 punchy sentences
-- "narrativeSprints": array of exactly 3-4 flowing paragraph strings that distill the author's narrative
-- "tags": array of 2-4 keyword strings
-- "masteryStatus": always the string "Red"
+Each object is a Knowledge Node with these exact keys:
 
-Rules:
-- Extract 4-7 of the most important concepts
-- Preserve the author's voice in narrativeSprints
+"id"               — unique kebab-case slug (e.g. "zero-to-one_last-mover-advantage")
+"bookTitle"        — the book's full title, inferred from the text
+"chapter"          — the chapter or section name
+"supportingContext"— EXACTLY 2 sentences. This is the HOOK: the 'why this matters' or the tension that sets up the insight. It must NOT summarize the Golden Thread or the Sprints. It primes the reader's brain.
+"goldenThread"     — EXACTLY 1 sentence. The sharpest, most distilled core insight. No hedging. No filler. Hit like a headline.
+"narrativeSprints" — An array of EXACTLY 3 to 4 strings. Each string is a single sprint of MAX 3 sentences. Together they must form a narrative arc: Sprint 1 opens the idea, Sprints 2-3 develop and complicate it, the final Sprint lands the payoff. Use the author's precise vocabulary. Cut all academic filler ('it can be argued that', 'this suggests', 'importantly'). Write like the book's best paragraphs — confident, specific, propulsive.
+"tags"             — array of 2-4 keyword strings
+"masteryStatus"    — always the string "Red"
+
+Hard rules:
+- Extract 4 to 7 of the most important concepts from the text
+- supportingContext: 2 sentences max — hook only, no spoilers
+- goldenThread: 1 sentence, period
+- Each narrativeSprint: 3 sentences max
+- NO repetition between supportingContext, goldenThread, and the sprints
 - Return nothing but the JSON array`;
 
 export async function POST(request: NextRequest) {

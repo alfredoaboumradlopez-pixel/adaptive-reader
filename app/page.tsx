@@ -609,21 +609,21 @@ export default function HomePage() {
                 </div>
 
                 {/* Concept Anchor — pinned mental foundation */}
-                <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/70 to-zinc-950/80 p-6 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-8">
+                <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/70 to-zinc-950/80 p-4 shadow-xl shadow-black/40 backdrop-blur-xl sm:p-5">
                   <p className="text-[10px] font-sans uppercase tracking-[0.26em] text-zinc-500">Concept Anchor</p>
                   <p className="mt-1.5 text-sm font-medium text-zinc-300">{libraryReadingNode.chapter}</p>
                   <div className={`mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${readingMasteryTone.badge}`}>
                     <span className={`h-1.5 w-1.5 rounded-full ${readingMasteryTone.dot}`} />
                     {readingMasteryTone.label}
                   </div>
-                  <div className="mt-5 space-y-5 rounded-xl border border-white/8 bg-black/20 p-5">
+                  <div className="mt-4 space-y-4 rounded-xl border border-white/8 bg-black/20 p-4">
                     <div>
                       <p className="text-[10px] font-sans uppercase tracking-[0.22em] text-zinc-600">Supporting Context</p>
                       <p className="mt-2.5 font-serif text-base leading-[1.75] text-zinc-300 sm:text-[1.05rem]">
                         {libraryReadingNode.supportingContext}
                       </p>
                     </div>
-                    <div className="border-t border-white/8 pt-5">
+                    <div className="border-t border-white/8 pt-4">
                       <p className="text-[10px] font-sans uppercase tracking-[0.22em] text-zinc-600">Golden Thread</p>
                       <p className="mt-2.5 font-serif text-lg leading-[1.7] text-zinc-50 sm:text-xl">
                         {libraryReadingNode.goldenThread}
@@ -645,7 +645,7 @@ export default function HomePage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -14 }}
                       transition={{ duration: 0.38, ease: [0.4, 0, 0.2, 1] }}
-                      className="mt-5 font-serif text-xl leading-[1.85] text-zinc-200 sm:text-[1.35rem] sm:leading-[1.9]"
+                      className="mt-5 font-serif text-xl leading-relaxed text-zinc-100 sm:text-2xl sm:leading-relaxed"
                     >
                       {libraryReadingNode.narrativeSprints[currentSprintIndex]}
                     </motion.p>
