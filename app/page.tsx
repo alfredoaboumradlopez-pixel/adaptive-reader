@@ -46,7 +46,7 @@ const masteryStyles: Record<
   },
 };
 
-const LOCAL_STORAGE_KEY = "adaptive_reader_knowledge_graph";
+const LOCAL_STORAGE_KEY = "adaptive-reader-data";
 
 const statusColor: Record<MasteryStatus, string> = {
   Green: "#10B981",
@@ -165,22 +165,64 @@ export default function HomePage() {
     fileInputRef.current?.click();
   };
 
-  const mockProcessPdf = (fileName: string) => {
+  const handleFileUpload = async (file: File) => {
     setIsProcessingPdf(true);
-    setToastText(`Processing "${fileName}"...`);
+    setToastText(`Processing "${file.name}"...`);
 
-    window.setTimeout(() => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/ingest", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error((body as { error?: string }).error ?? "Ingestion failed");
+      }
+
+      const { nodes: rawNodes } = (await response.json()) as {
+        nodes: Partial<EmpireNode>[];
+      };
+
+      const newNodes: EmpireNode[] = rawNodes.map((n) => ({
+        sprintCount: 0,
+        color: "#EF4444",
+        tags: [],
+        narrativeSprints: [],
+        supportingContext: "",
+        goldenThread: "",
+        ...n,
+        id: n.id ?? `node_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+        bookTitle: n.bookTitle ?? "Unknown",
+        chapter: n.chapter ?? "Unknown",
+        masteryStatus: "Red",
+      }));
+
+      setGraphState((prev) => {
+        const updated = { nodes: [...prev.nodes, ...newNodes], links: prev.links };
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+        return updated;
+      });
+
+      setToastText(`"${file.name}" ingested — ${newNodes.length} nodes added.`);
+      setCurrentView("map");
+    } catch (error) {
+      setToastText(
+        error instanceof Error ? error.message : "Ingestion failed.",
+      );
+    } finally {
       setIsProcessingPdf(false);
-      setToastText(`Processed "${fileName}" (mock flow).`);
-
-      window.setTimeout(() => setToastText(null), 1800);
-    }, 1600);
+      window.setTimeout(() => setToastText(null), 2500);
+    }
   };
 
   const handleFileSelection = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    mockProcessPdf(file.name);
+    void handleFileUpload(file);
     event.target.value = "";
   };
 
@@ -326,7 +368,7 @@ export default function HomePage() {
       window.setTimeout(() => setToastText(null), 1800);
       return;
     }
-    mockProcessPdf(file.name);
+    void handleFileUpload(file);
   };
 
   const bookRoster = useMemo(() => {

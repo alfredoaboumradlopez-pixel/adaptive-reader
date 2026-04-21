@@ -2,7 +2,7 @@ export type MasteryStatus = "Red" | "Yellow" | "Green";
 
 export type EmpireNode = {
   id: string;
-  bookTitle: "Zero to One" | "Principles of Cost Controls";
+  bookTitle: string;
   chapter: string;
   supportingContext: string;
   goldenThread: string;

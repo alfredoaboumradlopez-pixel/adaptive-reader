@@ -1,6 +1,8 @@
 node_modules/
 build/
 dist/
+.next/
+.claude/
 coverage/
 .DS_Store
 *.log
