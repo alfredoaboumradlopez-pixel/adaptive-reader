@@ -608,28 +608,18 @@ export default function HomePage() {
                   <p className="truncate text-sm text-zinc-500">{libraryReadingNode.bookTitle}</p>
                 </div>
 
-                {/* Concept Anchor — pinned mental foundation */}
-                <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/70 to-zinc-950/80 p-4 shadow-xl shadow-black/40 backdrop-blur-xl sm:p-5">
-                  <p className="text-[10px] font-sans uppercase tracking-[0.26em] text-zinc-500">Concept Anchor</p>
-                  <p className="mt-1.5 text-sm font-medium text-zinc-300">{libraryReadingNode.chapter}</p>
-                  <div className={`mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${readingMasteryTone.badge}`}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${readingMasteryTone.dot}`} />
-                    {readingMasteryTone.label}
-                  </div>
-                  <div className="mt-4 space-y-4 rounded-xl border border-white/8 bg-black/20 p-4">
-                    <div>
-                      <p className="text-[10px] font-sans uppercase tracking-[0.22em] text-zinc-600">Supporting Context</p>
-                      <p className="mt-2.5 font-serif text-base leading-[1.75] text-zinc-300 sm:text-[1.05rem]">
-                        {libraryReadingNode.supportingContext}
-                      </p>
-                    </div>
-                    <div className="border-t border-white/8 pt-4">
-                      <p className="text-[10px] font-sans uppercase tracking-[0.22em] text-zinc-600">Golden Thread</p>
-                      <p className="mt-2.5 font-serif text-lg leading-[1.7] text-zinc-50 sm:text-xl">
-                        {libraryReadingNode.goldenThread}
-                      </p>
+                {/* Concept Anchor — a subtle primer, not the main event */}
+                <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-4 py-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[10px] font-sans uppercase tracking-[0.28em] text-zinc-600">The Setup</p>
+                    <div className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${readingMasteryTone.badge}`}>
+                      <span className={`h-1 w-1 rounded-full ${readingMasteryTone.dot}`} />
+                      {readingMasteryTone.label}
                     </div>
                   </div>
+                  <p className="mt-2 font-serif text-sm leading-[1.65] text-zinc-400 sm:text-[0.9rem]">
+                    {libraryReadingNode.supportingContext}
+                  </p>
                 </div>
 
                 {/* Sprint Canvas — one sprint at a time */}
@@ -673,22 +663,31 @@ export default function HomePage() {
                         initial={{ opacity: 0, y: 24 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.45, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                        className="mt-16 border-t border-white/10 pt-10"
+                        className="mt-14 space-y-8"
                       >
-                        <p className="text-[10px] font-sans uppercase tracking-[0.26em] text-zinc-500">Friction Gate</p>
-                        <p className="mt-2 text-sm text-amber-100/70">
-                          You've reached the end of this sprint. Prove your mastery.
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => openSocraticSprint(libraryReadingNode)}
-                          className="mt-5 w-full max-w-sm rounded-xl border border-amber-300/40 bg-gradient-to-r from-amber-200/95 to-orange-200/95 px-5 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg shadow-amber-500/25 transition hover:brightness-110 hover:shadow-amber-400/40"
-                          style={{
-                            animation: "glow-pulse 2.5s ease-in-out infinite",
-                          }}
-                        >
-                          Begin Socratic Honing Sprint
-                        </button>
+                        {/* The Reveal — Golden Thread surfaces here, not before */}
+                        <div className="rounded-xl border border-violet-400/20 bg-violet-500/[0.06] px-5 py-4">
+                          <p className="text-[10px] font-sans uppercase tracking-[0.28em] text-violet-400/70">The Reveal</p>
+                          <p className="mt-2 font-serif text-lg leading-[1.7] text-zinc-100 sm:text-xl">
+                            {libraryReadingNode.goldenThread}
+                          </p>
+                        </div>
+
+                        {/* Socratic gate */}
+                        <div className="border-t border-white/8 pt-8">
+                          <p className="text-[10px] font-sans uppercase tracking-[0.28em] text-zinc-600">Friction Gate</p>
+                          <p className="mt-2 text-sm text-zinc-500">
+                            You've read the full chapter. Now prove it stuck.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => openSocraticSprint(libraryReadingNode)}
+                            className="mt-4 w-full max-w-sm rounded-xl border border-amber-300/40 bg-gradient-to-r from-amber-200/95 to-orange-200/95 px-5 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg shadow-amber-500/25 transition hover:brightness-110 hover:shadow-amber-400/40"
+                            style={{ animation: "glow-pulse 2.5s ease-in-out infinite" }}
+                          >
+                            Begin Socratic Honing Sprint
+                          </button>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
