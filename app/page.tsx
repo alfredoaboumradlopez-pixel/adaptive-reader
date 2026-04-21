@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { AnimatePresence, motion } from "motion/react";
 import {
   ChangeEvent,
   DragEvent,
@@ -102,6 +103,7 @@ export default function HomePage() {
   const [chatInput, setChatInput] = useState("");
   const [isMockAiThinking, setIsMockAiThinking] = useState(false);
   const [isDropzoneActive, setIsDropzoneActive] = useState(false);
+  const [currentSprintIndex, setCurrentSprintIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isOpen = Boolean(activeNode) && currentView === "map";
 
@@ -160,6 +162,10 @@ export default function HomePage() {
   useEffect(() => {
     setLibraryReadingNode(null);
   }, [selectedBook]);
+
+  useEffect(() => {
+    setCurrentSprintIndex(0);
+  }, [libraryReadingNode?.id]);
 
   const openIngestDialog = () => {
     fileInputRef.current?.click();
@@ -589,7 +595,8 @@ export default function HomePage() {
                 )}
               </div>
             ) : (
-              <div className="mx-auto min-h-full w-full max-w-3xl px-4 pb-32 pt-8 sm:max-w-4xl lg:max-w-5xl lg:px-10">
+              <div className="relative mx-auto min-h-full w-full max-w-[760px] px-5 pb-28 pt-8 lg:px-8">
+                {/* Top nav */}
                 <div className="mb-10 flex items-center justify-between gap-4">
                   <button
                     type="button"
@@ -601,62 +608,116 @@ export default function HomePage() {
                   <p className="truncate text-sm text-zinc-500">{libraryReadingNode.bookTitle}</p>
                 </div>
 
-                <div className="rounded-2xl border border-white/12 bg-gradient-to-b from-zinc-900/80 to-zinc-950/90 p-6 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-8">
-                  <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Concept Anchor</p>
-                  <p className="mt-2 text-sm text-zinc-400">{libraryReadingNode.chapter}</p>
-                  <div
-                    className={`mt-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${readingMasteryTone.badge}`}
-                  >
+                {/* Concept Anchor — pinned mental foundation */}
+                <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/70 to-zinc-950/80 p-6 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-8">
+                  <p className="text-[10px] font-sans uppercase tracking-[0.26em] text-zinc-500">Concept Anchor</p>
+                  <p className="mt-1.5 text-sm font-medium text-zinc-300">{libraryReadingNode.chapter}</p>
+                  <div className={`mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${readingMasteryTone.badge}`}>
                     <span className={`h-1.5 w-1.5 rounded-full ${readingMasteryTone.dot}`} />
                     {readingMasteryTone.label}
                   </div>
-                  <div className="mt-6 space-y-6 rounded-xl border border-white/10 bg-black/25 p-5 sm:p-6">
+                  <div className="mt-5 space-y-5 rounded-xl border border-white/8 bg-black/20 p-5">
                     <div>
-                      <p className="text-[11px] font-sans uppercase tracking-[0.2em] text-zinc-500">
-                        Supporting Context
-                      </p>
-                      <p className="mt-3 font-serif text-lg leading-[1.75] text-zinc-200">
+                      <p className="text-[10px] font-sans uppercase tracking-[0.22em] text-zinc-600">Supporting Context</p>
+                      <p className="mt-2.5 font-serif text-base leading-[1.75] text-zinc-300 sm:text-[1.05rem]">
                         {libraryReadingNode.supportingContext}
                       </p>
                     </div>
-                    <div className="border-t border-white/10 pt-6">
-                      <p className="text-[11px] font-sans uppercase tracking-[0.2em] text-zinc-500">
-                        Golden Thread
-                      </p>
-                      <p className="mt-3 font-serif text-xl leading-[1.75] text-zinc-50">
+                    <div className="border-t border-white/8 pt-5">
+                      <p className="text-[10px] font-sans uppercase tracking-[0.22em] text-zinc-600">Golden Thread</p>
+                      <p className="mt-2.5 font-serif text-lg leading-[1.7] text-zinc-50 sm:text-xl">
                         {libraryReadingNode.goldenThread}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-12">
-                  <p className="text-xs font-sans uppercase tracking-[0.22em] text-zinc-600">
-                    Reading
+                {/* Sprint Canvas — one sprint at a time */}
+                <div className="mt-14">
+                  <p className="text-[10px] font-sans uppercase tracking-[0.26em] text-zinc-600">
+                    Sprint {currentSprintIndex + 1} of {libraryReadingNode.narrativeSprints.length}
                   </p>
-                  <div className="mt-6 space-y-10">
-                    {libraryReadingNode.narrativeSprints.map((sprint, index) => (
-                      <p
-                        key={`${libraryReadingNode.id}-read-${index}`}
-                        className="font-serif text-[1.05rem] leading-[1.85] text-zinc-300 sm:text-lg sm:leading-[1.9]"
+
+                  <AnimatePresence mode="wait">
+                    <motion.p
+                      key={`${libraryReadingNode.id}-sprint-${currentSprintIndex}`}
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -14 }}
+                      transition={{ duration: 0.38, ease: [0.4, 0, 0.2, 1] }}
+                      className="mt-5 font-serif text-xl leading-[1.85] text-zinc-200 sm:text-[1.35rem] sm:leading-[1.9]"
+                    >
+                      {libraryReadingNode.narrativeSprints[currentSprintIndex]}
+                    </motion.p>
+                  </AnimatePresence>
+
+                  {/* Continue / Next */}
+                  {currentSprintIndex < libraryReadingNode.narrativeSprints.length - 1 && (
+                    <motion.button
+                      type="button"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                      onClick={() => setCurrentSprintIndex((i) => i + 1)}
+                      className="group mt-10 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-zinc-300 transition hover:border-white/20 hover:bg-white/10 hover:text-zinc-100"
+                    >
+                      Continue reading
+                      <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                    </motion.button>
+                  )}
+
+                  {/* Friction Gate — appears only at the final sprint */}
+                  <AnimatePresence>
+                    {currentSprintIndex === libraryReadingNode.narrativeSprints.length - 1 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 24 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.45, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                        className="mt-16 border-t border-white/10 pt-10"
                       >
-                        {sprint}
-                      </p>
-                    ))}
-                  </div>
+                        <p className="text-[10px] font-sans uppercase tracking-[0.26em] text-zinc-500">Friction Gate</p>
+                        <p className="mt-2 text-sm text-amber-100/70">
+                          You've reached the end of this sprint. Prove your mastery.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => openSocraticSprint(libraryReadingNode)}
+                          className="mt-5 w-full max-w-sm rounded-xl border border-amber-300/40 bg-gradient-to-r from-amber-200/95 to-orange-200/95 px-5 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg shadow-amber-500/25 transition hover:brightness-110 hover:shadow-amber-400/40"
+                          style={{
+                            animation: "glow-pulse 2.5s ease-in-out infinite",
+                          }}
+                        >
+                          Begin Socratic Honing Sprint
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                <div className="mt-16 border-t border-white/10 pt-10">
-                  <p className="text-xs font-sans uppercase tracking-[0.2em] text-zinc-500">
-                    Friction Gate
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => openSocraticSprint(libraryReadingNode)}
-                    className="mt-5 w-full max-w-md rounded-xl border border-amber-300/35 bg-gradient-to-r from-amber-200/95 to-orange-200/95 px-5 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg shadow-amber-900/20 transition hover:brightness-105"
-                  >
-                    Begin Socratic Honing Sprint
-                  </button>
+                {/* Progress bar — fixed to bottom */}
+                <div className="fixed bottom-0 left-0 right-0 flex items-center justify-center gap-2 pb-6 pt-4">
+                  <div className="flex items-center gap-2 rounded-full border border-white/10 bg-zinc-950/80 px-4 py-2 backdrop-blur-xl">
+                    {libraryReadingNode.narrativeSprints.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setCurrentSprintIndex(i)}
+                        aria-label={`Go to sprint ${i + 1}`}
+                        className="relative h-1.5 overflow-hidden rounded-full transition-all duration-300 focus:outline-none"
+                        style={{ width: i === currentSprintIndex ? 28 : 6 }}
+                      >
+                        <span
+                          className={`absolute inset-0 rounded-full transition-colors duration-300 ${
+                            i < currentSprintIndex
+                              ? "bg-emerald-400/70"
+                              : i === currentSprintIndex
+                                ? "bg-violet-400"
+                                : "bg-white/20"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
