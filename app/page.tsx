@@ -241,13 +241,30 @@ export default function HomePage() {
         masteryStatus: "Red",
       }));
 
+      // Deduplicate within the new batch first (same chapter title appearing in multiple chunks)
+      const seenInBatch = new Set<string>();
+      const dedupedWithinBatch = newNodes.filter((n) => {
+        const key = `${n.bookTitle}::${n.chapter.toLowerCase().trim()}`;
+        if (seenInBatch.has(key)) return false;
+        seenInBatch.add(key);
+        return true;
+      });
+
+      let addedCount = 0;
       setGraphState((prev) => {
-        const updated = { nodes: [...prev.nodes, ...newNodes], links: prev.links };
+        const existingChapters = new Set(
+          prev.nodes.map((n) => `${n.bookTitle}::${n.chapter.toLowerCase().trim()}`),
+        );
+        const dedupedNodes = dedupedWithinBatch.filter(
+          (n) => !existingChapters.has(`${n.bookTitle}::${n.chapter.toLowerCase().trim()}`),
+        );
+        addedCount = dedupedNodes.length;
+        const updated = { nodes: [...prev.nodes, ...dedupedNodes], links: prev.links };
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
         return updated;
       });
 
-      setToastText(`"${file.name}" ingested — ${newNodes.length} nodes added.`);
+      setToastText(`"${file.name}" ingested — ${addedCount} nodes added.`);
       setCurrentView("map");
     } catch (error) {
       setToastText(
@@ -430,7 +447,12 @@ export default function HomePage() {
 
   const selectedBookNodes = useMemo(() => {
     if (!selectedBook) return [];
-    return graphState.nodes.filter((node) => node.bookTitle === selectedBook);
+    const nodes = graphState.nodes.filter((node) => node.bookTitle === selectedBook);
+    return nodes.sort((a, b) => {
+      const numA = parseInt(a.chapter.match(/\d+/)?.[0] ?? "0", 10);
+      const numB = parseInt(b.chapter.match(/\d+/)?.[0] ?? "0", 10);
+      return numA - numB || a.chapter.localeCompare(b.chapter);
+    });
   }, [graphState.nodes, selectedBook]);
 
   return (

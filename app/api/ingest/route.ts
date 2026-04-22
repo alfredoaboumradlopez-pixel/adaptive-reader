@@ -113,11 +113,15 @@ async function scanChunk(
   const nodes = JSON.parse(raw);
   if (!Array.isArray(nodes)) return [];
 
-  // Suffix IDs with part index to guarantee uniqueness across chunks
-  return (nodes as Record<string, unknown>[]).map((n, i) => ({
-    ...n,
-    id: `${(n.id as string) ?? `node_p${part}_${i}`}_p${part}`,
-  }));
+  return (nodes as Record<string, unknown>[]).map((n) => {
+    const chapter = typeof n.chapter === "string" ? n.chapter : "";
+    const slug = chapter
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .trim()
+      .replace(/\s+/g, "-");
+    return { ...n, id: slug || `node_p${part}_${Math.random().toString(36).slice(2)}` };
+  });
 }
 
 export async function POST(request: NextRequest) {
