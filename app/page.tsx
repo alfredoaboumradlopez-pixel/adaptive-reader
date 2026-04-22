@@ -244,7 +244,10 @@ export default function HomePage() {
         nodes: Partial<EmpireNode>[];
       };
 
-      const newNodes: EmpireNode[] = rawNodes.map((n) => {
+      const ADMIN_NOISE =
+        /^(acknowledgment|index|bibliograph|reference|illustration credit|about the author|praise for|further reading|also by|copyright|permissions|table of contents)/i;
+
+      const allNodes: EmpireNode[] = rawNodes.map((n) => {
         const chapter = (n.chapter ?? "Unknown") as string;
         const bookTitle = (n.bookTitle ?? "Unknown") as string;
         const num = chapterNum(chapter);
@@ -263,6 +266,14 @@ export default function HomePage() {
           masteryStatus: "Red" as MasteryStatus,
           level: (n.level as 0 | 1 | 2) ?? defaultLevel,
         };
+      });
+
+      // Structural Gatekeeper: discard anything that doesn't match "[N]: Title"
+      // and any admin noise that slipped through despite server-side filtering
+      const newNodes = allNodes.filter((n) => {
+        if (!/^\d+:/.test(n.chapter)) return false;
+        if (ADMIN_NOISE.test(n.chapter.replace(/^\d+:\s*/, ""))) return false;
+        return true;
       });
 
       // First-in-wins dedup within this batch by canonical ID
