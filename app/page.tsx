@@ -185,18 +185,19 @@ export default function HomePage() {
   useEffect(() => {
     if (!isProcessingPdf) return;
     const phases = [
-      "Scanning Part 1 / 5...",
-      "Scanning Part 2 / 5...",
-      "Scanning Part 3 / 5...",
-      "Scanning Part 4 / 5...",
-      "Scanning Part 5 / 5... Almost there.",
+      "Mapping book structure...",
+      "Deep scan — Part 1 / 5...",
+      "Deep scan — Part 2 / 5...",
+      "Deep scan — Part 3 / 5...",
+      "Deep scan — Part 4 / 5...",
+      "Deep scan — Part 5 / 5... Almost there.",
     ];
     let idx = 0;
     setToastText(phases[0]);
     const id = window.setInterval(() => {
       idx = Math.min(idx + 1, phases.length - 1);
       setToastText(phases[idx]);
-    }, 10000);
+    }, 11000); // 6 phases × 11s = 66s total coverage
     return () => window.clearInterval(id);
   }, [isProcessingPdf]);
 
@@ -276,24 +277,33 @@ export default function HomePage() {
         return true;
       });
 
-      // First-in-wins dedup within this batch by canonical ID
+      // Within-batch: keep the version of each chapter with the most sprints
+      // (handles a chapter split across two chunks — the richer half wins)
       const batchById = new Map<string, EmpireNode>();
       for (const n of newNodes) {
-        if (!batchById.has(n.id)) batchById.set(n.id, n);
+        const existing = batchById.get(n.id);
+        if (!existing || n.narrativeSprints.length > existing.narrativeSprints.length) {
+          batchById.set(n.id, n);
+        }
       }
       const dedupedBatch = Array.from(batchById.values());
 
       let addedCount = 0;
       setGraphState((prev) => {
-        // Merge: existing nodes win over incoming duplicates
-        const existingById = new Map(prev.nodes.map((n) => [n.id, n]));
-        const toAdd = dedupedBatch.filter((n) => !existingById.has(n.id));
-        addedCount = toAdd.length;
-        // Sort entire merged array by chapter number extracted from canonical ID
-        const merged = [...prev.nodes, ...toAdd].sort((a, b) => {
+        // Merge against stored state: richer version wins
+        const nodeMap = new Map(prev.nodes.map((n) => [n.id, n]));
+        for (const n of dedupedBatch) {
+          const existing = nodeMap.get(n.id);
+          if (!existing) {
+            nodeMap.set(n.id, n);
+            addedCount++;
+          } else if (n.narrativeSprints.length > existing.narrativeSprints.length) {
+            nodeMap.set(n.id, n); // replace with richer version from split chapter
+          }
+        }
+        const merged = Array.from(nodeMap.values()).sort((a, b) => {
           const numA = parseInt(a.id.split("-").at(-1) ?? "0", 10);
           const numB = parseInt(b.id.split("-").at(-1) ?? "0", 10);
-          // Group by book first, then chapter number
           const bookCmp = a.bookTitle.localeCompare(b.bookTitle);
           return bookCmp !== 0 ? bookCmp : numA - numB;
         });

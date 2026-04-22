@@ -21,25 +21,25 @@ async function extractText(buffer: ArrayBuffer): Promise<string> {
 }
 
 // ─────────────────────────────────────────────────────────────
-// PHASE 1: TOC DISCOVERY
+// PHASE 1 — TOC DISCOVERY ("The Truth Table")
 // ─────────────────────────────────────────────────────────────
 
 type TocEntry = { number: number; title: string };
 
-const TOC_PROMPT = `You are a structural analyst. Your ONLY job is to extract the Table of Contents from the text below.
+const TOC_PROMPT = `You are a structural analyst. Your ONLY job is to build the Truth Table — the master list of Level 1 chapters for this book.
 
-Return a JSON array of the Level 1 chapters only — the actual numbered chapters, not sub-sections:
+Return a JSON array of top-level chapters only:
 [{"number": 1, "title": "The Challenge of the Future"}, {"number": 4, "title": "Capture"}, ...]
 
 RULES:
-- Include ONLY top-level, numbered chapters.
-- NEVER include sub-sections, sub-headers, or call-out boxes.
+- Include ONLY top-level, numbered chapters — not sub-sections, call-out boxes, or sub-headers.
 - Preface / Introduction / Prologue / Foreword → {"number": 0, "title": "Introduction"}
-- Conclusion / Epilogue / Afterword → {"number": 99, "title": "Conclusion"}
-- EXCLUDE entirely: Index, Bibliography, Acknowledgments, Credits, About the Author,
+- Conclusion / Epilogue / Afterword            → {"number": 99, "title": "Conclusion"}
+- EXCLUDE: Index, Bibliography, Acknowledgments, Credits, About the Author,
   Praise for..., Further Reading, Also by the Author, Copyright, Permissions.
-- If no Table of Contents is visible, scan for numbered chapter headings and infer the list.
-- Return ONLY the raw JSON array. No markdown. No explanation. No preamble.`;
+- If no Table of Contents is visible, infer chapter structure from any numbered headings.
+- Be GENEROUS: include every chapter you can identify. Missing a chapter is worse than including one.
+- Return ONLY the raw JSON array. No markdown. No explanation.`;
 
 async function discoverTOC(ai: GoogleGenAI, tocChunk: string): Promise<TocEntry[]> {
   try {
@@ -56,123 +56,115 @@ async function discoverTOC(ai: GoogleGenAI, tocChunk: string): Promise<TocEntry[
       (e) => typeof e.number === "number" && typeof e.title === "string",
     );
   } catch {
-    return []; // Fallback: no approved list → content pass uses open scan
+    return [];
   }
 }
 
 // ─────────────────────────────────────────────────────────────
-// PHASE 2: CONTENT EXTRACTION
+// PHASE 2 — CONTENT EXTRACTION (Truth Table–guided)
 // ─────────────────────────────────────────────────────────────
 
-function buildContentPrompt(approvedChapters: TocEntry[]): string {
-  const hasToc = approvedChapters.length > 0;
+function buildContentPrompt(truthTable: TocEntry[]): string {
+  const hasTOC = truthTable.length > 0;
 
-  const approvedBlock = hasToc
+  const truthTableBlock = hasTOC
     ? `════════════════════════════════════════
-APPROVED CHAPTER LIST — LAW 0 (ABSOLUTE)
+TRUTH TABLE — YOUR NAVIGATION MAP
 ════════════════════════════════════════
-You MAY ONLY create nodes for the chapters on this list. This is the complete set.
+This is the complete list of Level 1 chapters for this book. Use it as your compass.
 
-${approvedChapters.map((c) => `  ${c.number}: ${c.title}`).join("\n")}
+${truthTable.map((c) => `  ${c.number}: ${c.title}`).join("\n")}
 
-ABSOLUTE RULE: Do NOT create nodes for sub-sections, sub-headers, sidebars, or call-out boxes.
-Sub-sections are FUEL for the parent chapter's Sprints — compress them into Sprint content.
-If Chapter 4 has sub-sections A, B, C → they become Sprint 1, Sprint 2, Sprint 3 of Chapter 4.
-They do NOT become separate nodes. Zero exceptions.`
+YOUR EXTRACTION RULES:
+1. Extract a node for EVERY chapter from the Truth Table that appears in the text chunk below.
+   Do not skip any chapter. If you see it, extract it.
+2. If a chapter starts in this chunk but its content continues beyond the chunk boundary,
+   extract what you have. The next chunk will provide the remainder.
+3. Sub-sections, sub-headers, and call-out boxes within a chapter are FUEL for that chapter's
+   Sprints — they do NOT become independent nodes.
+   Example: Chapter 4 with sub-sections A, B, C → Sprint 1 covers A, Sprint 2 covers B, Sprint 3 covers C.
+4. You MAY create a node for a chapter NOT on the Truth Table ONLY if it is clearly a numbered
+   top-level chapter the TOC missed. When in doubt, include it.`
     : `════════════════════════════════════════
-STRUCTURAL FILTER (no TOC found — apply strictly)
+STRUCTURAL GUIDANCE (no TOC found — apply carefully)
 ════════════════════════════════════════
-Extract only top-level, numbered chapters. Fold all sub-sections into their parent's Sprints.
-Do NOT create nodes for sub-headers or non-chapter sections.`;
+Extract ALL top-level numbered chapters you find in this text.
+Sub-sections and sub-headers are FUEL for their parent chapter's Sprints — not independent nodes.
+One chapter header = one node. Never skip a chapter.`;
 
-  return `You are a Structural Scanner and Narrative Architect. For each confirmed Level 1 chapter you find, distill it into a three-act psychological experience: Scene → Discovery → Truth.
+  return `You are a Structural Scanner and Narrative Architect. For each Level 1 chapter you find, distill it into a three-act psychological experience: Scene → Discovery → Truth.
 
 Return ONLY a raw JSON array — no markdown, no code fences, no backticks, no preamble.
 
 Each object is a Knowledge Node with these exact keys:
 "id", "bookTitle", "chapter", "supportingContext", "goldenThread", "narrativeSprints", "tags", "masteryStatus", "level"
 
-${approvedBlock}
+${truthTableBlock}
 
 ════════════════════════════════════════
-LAW 1 — ID + CHAPTER PROTOCOL (MANDATORY)
+FORMATTING LAWS (all mandatory)
 ════════════════════════════════════════
-The "chapter" field MUST follow this EXACT format: [Number]: [Short Title]
+
+— ID + CHAPTER PROTOCOL —
+"chapter" field MUST be: [Number]: [Short Title]
   CORRECT: "4: Capture"   "0: Introduction"   "12: The Final Gambit"
   FORBIDDEN: "Chapter 4"   "Section IV"   "Chapter Four: Capture"   "Capture"
-Special:
-  Introduction / Preface / Prologue / Foreword → "0: Introduction"
-  Conclusion / Epilogue / Afterword             → "99: Conclusion"
+  Introduction / Preface / Prologue → "0: Introduction"
+  Conclusion / Epilogue / Afterword → "99: Conclusion"
 
-The "id" MUST be [book-slug]-[chapter-number].
+"id" field MUST be: [book-slug]-[chapter-number]
   book-slug = bookTitle lowercased, spaces→hyphens, non-alphanumeric removed
-  EXAMPLE: "Building a Second Brain", chapter "4: Capture" → id "building-a-second-brain-4"
-  EXAMPLE: "Zero to One", chapter "0: Introduction" → id "zero-to-one-0"
+  EXAMPLE: "Building a Second Brain" ch "4: Capture" → id "building-a-second-brain-4"
 
-════════════════════════════════════════
-LAW 2 — "supportingContext" (THE SCENE — 2 SENTENCES)
-════════════════════════════════════════
-Write EXACTLY 2 sentences. Describe the static state BEFORE the story begins.
-Show the world at rest. Leave a gap the reader must cross to find out what happens.
-BANNED WORDS: 'Chapter', 'Section', 'Summarize', 'Summary', 'unlike', 'whereas',
-'but', 'yet', 'however', 'while', 'though', 'although', 'despite', 'difference',
-'contrast', 'divide', 'prosperous', 'poor', 'rich', 'wealthy', 'success', 'failure',
-'dangerous', 'safe', 'better', 'worse', 'explains', 'reveals', 'shows', 'proves'.
+— THE SCENE ("supportingContext") — EXACTLY 2 SENTENCES —
+Describe the static world BEFORE the story begins. No outcomes. No contrast. No spoilers.
+BANNED: 'Chapter', 'Section', 'Summarize', 'unlike', 'whereas', 'but', 'yet', 'however',
+'while', 'though', 'although', 'despite', 'difference', 'contrast', 'divide', 'poor',
+'rich', 'wealthy', 'success', 'failure', 'dangerous', 'safe', 'better', 'worse',
+'explains', 'reveals', 'shows', 'proves'.
 
---- EXAMPLES ---
-GOOD: "In 2004, Blockbuster operated 9,000 stores, employed 60,000 people, and carried a $6 billion valuation. Reed Hastings had requested a meeting with their CEO three years earlier."
-BAD:  "Blockbuster ignored streaming and went bankrupt while Netflix thrived."
+GOOD example: "In 2004, Blockbuster operated 9,000 stores and carried a $6 billion valuation. Reed Hastings had requested a meeting with their CEO three years earlier."
+BAD example:  "Blockbuster ignored streaming and went bankrupt while Netflix thrived."
 
-════════════════════════════════════════
-LAW 3 — "narrativeSprints" (THE DISCOVERY)
-════════════════════════════════════════
-Array of EXACTLY 3 to 4 strings. Each string: 4 to 5 vivid sentences. Flowing prose — no bullet points.
-
-- Sprint 1: One concrete, tactile scene or detail from the chapter. A place, a person, a number.
+— SPRINTS ("narrativeSprints") — EXACTLY 3 TO 4 STRINGS —
+Each string: 4 to 5 vivid sentences of flowing prose. No bullet points.
+- Sprint 1: One concrete, tactile scene — a place, a person, a number from the chapter.
 - Sprint 2: The core mechanism in the author's EXACT vocabulary ('PARA', 'creative destruction', 'progressive summarization', 'zero to one').
-- Sprint 3–4: Specific evidence — names, numbers, anecdotes. Sub-sections are compressed here. Build to the truth without stating it.
+- Sprint 3–4: Specific evidence, names, numbers, anecdotes. Build toward the truth without stating it.
+VOICE: Contrarian + philosophical for Thiel. Tactical + empowering for Forte. Curious + clinical for Gladwell. No hedging. No filler.
 
-VOICE: Mirror the author's register. Contrarian + philosophical for Thiel. Tactical + empowering for Forte. Curious + clinical for Gladwell. No hedging. No filler.
+— THE TRUTH ("goldenThread") — EXACTLY 1 SENTENCE —
+The singular 'Aha!' insight of the ENTIRE chapter — not just the opening paragraph.
+Must resolve the curiosity gap opened by supportingContext.
+Only place where outcomes or judgments are permitted.
 
-════════════════════════════════════════
-LAW 4 — "goldenThread" (THE TRUTH — 1 SENTENCE)
-════════════════════════════════════════
-The singular 'Aha!' insight of the ENTIRE chapter — not just the first paragraph.
-It must resolve the curiosity gap opened by supportingContext.
-This is the ONLY place outcomes or judgments are permitted.
+— REMAINING FIELDS —
+"level"         — 0 (Intro/Preface), 1 (core chapters), 2 (deep-dive/technical/appendix)
+"tags"          — 2 to 4 keyword strings
+"masteryStatus" — always "Red"
 
-════════════════════════════════════════
-REMAINING FIELDS
-════════════════════════════════════════
-"level"        — 0 (Intro/Preface), 1 (core chapters), 2 (deep-dive/technical/appendix)
-"tags"         — 2 to 4 keyword strings
-"masteryStatus"— always "Red"
-
-════════════════════════════════════════
-LAW 5 — NOISE FILTER
-════════════════════════════════════════
+— NOISE FILTER —
 SKIP entirely: Acknowledgments, Index, Bibliography, References, About the Author,
-Praise for..., Further Reading, Table of Contents, Copyright, Permissions.
-Appendix: skip unless it contains a standalone conceptual argument.
-If a section has no Golden Thread, it does not exist. Skip it.
+Further Reading, Table of Contents, Copyright, Permissions.
+Appendix: skip unless it contains a standalone conceptual argument with a Golden Thread.
 
 ════════════════════════════════════════
 FINAL CHECK — run before outputting
 ════════════════════════════════════════
-1. Every node's chapter on the approved list? Remove any not on the list.
-2. supportingContext: exactly 2 sentences, no banned words?
-3. Every "chapter" follows "[N]: [Title]" — no "Chapter" prefix?
+1. Did you extract a node for every Truth Table chapter visible in this text? Add any missing.
+2. supportingContext: exactly 2 sentences, no banned words, no outcomes?
+3. Every "chapter" follows "[N]: [Title]" with no "Chapter" prefix?
 4. Every "id" follows "[book-slug]-[N]"?
-5. Sprints use author's vocabulary + concrete evidence from the chapter?
-6. goldenThread is the chapter's primary insight, not just the opening paragraph?
+5. Sprints use the author's vocabulary + concrete evidence? 4-5 sentences each?
+6. goldenThread is the chapter's primary insight — not just the first paragraph?
 7. Every node has "level" 0, 1, or 2?
-8. Any blacklisted section sneaked in? Remove it.
+8. Any admin noise (Index, Acknowledgments, etc.) in your output? Remove it.
 
 Return nothing but the JSON array.`;
 }
 
 // ─────────────────────────────────────────────────────────────
-// SERVER-SIDE ID OVERRIDE
+// SERVER-SIDE ID OVERRIDE (canonical form regardless of Gemini output)
 // ─────────────────────────────────────────────────────────────
 
 function normaliseNodes(nodes: Record<string, unknown>[]): Record<string, unknown>[] {
@@ -199,7 +191,7 @@ function normaliseNodes(nodes: Record<string, unknown>[]): Record<string, unknow
 // CONTENT CHUNK SCAN
 // ─────────────────────────────────────────────────────────────
 
-const CHUNK_SIZE = 60_000;
+const CHUNK_SIZE = 100_000;
 const MAX_CHUNKS = 5;
 
 async function scanChunk(
@@ -207,18 +199,14 @@ async function scanChunk(
   chunk: string,
   part: number,
   total: number,
-  approvedChapters: TocEntry[],
+  truthTable: TocEntry[],
 ): Promise<Record<string, unknown>[]> {
-  const approvedNote =
-    approvedChapters.length > 0
-      ? `You have an APPROVED CHAPTER LIST embedded in your instructions above. ` +
-        `Only create nodes for chapters on that list. Fold sub-sections into Sprints.`
-      : `Extract only top-level numbered chapters. Fold sub-sections into their parent's Sprints.`;
+  const partNote =
+    `This is Part ${part} of ${total}. ` +
+    `Extract every chapter from your Truth Table that appears in this section. ` +
+    `If a chapter spans this boundary, extract what is here — the next chunk covers the rest.`;
 
-  const contents =
-    `${buildContentPrompt(approvedChapters)}\n\n` +
-    `PART ${part} of ${total}: ${approvedNote}\n\n` +
-    `BOOK TEXT — Part ${part}/${total}:\n${chunk}`;
+  const contents = `${buildContentPrompt(truthTable)}\n\n${partNote}\n\nBOOK TEXT — Part ${part}/${total}:\n${chunk}`;
 
   const result = await ai.models.generateContent({
     model: "gemini-2.5-pro",
@@ -250,14 +238,14 @@ export async function POST(request: NextRequest) {
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-    // Phase 1: TOC discovery from the first 20k chars (TOC is always near the front)
-    const approvedChapters = await discoverTOC(ai, fullText.slice(0, 20_000));
+    // Phase 1: Build the Truth Table from the first 20k chars (TOC lives near the front)
+    const truthTable = await discoverTOC(ai, fullText.slice(0, 20_000));
     console.log(
-      `[/api/ingest] TOC found: ${approvedChapters.length} chapters`,
-      approvedChapters.map((c) => `${c.number}: ${c.title}`),
+      `[/api/ingest] Truth Table: ${truthTable.length} chapters`,
+      truthTable.map((c) => `${c.number}: ${c.title}`),
     );
 
-    // Phase 2: Content extraction across up to 5 chunks in parallel
+    // Phase 2: Deep scan across up to 5 × 100k chunks in parallel
     const chunks: string[] = [];
     for (let i = 0; i < fullText.length && chunks.length < MAX_CHUNKS; i += CHUNK_SIZE) {
       const chunk = fullText.slice(i, i + CHUNK_SIZE).trim();
@@ -265,13 +253,13 @@ export async function POST(request: NextRequest) {
     }
 
     const results = await Promise.all(
-      chunks.map((chunk, i) => scanChunk(ai, chunk, i + 1, chunks.length, approvedChapters)),
+      chunks.map((chunk, i) => scanChunk(ai, chunk, i + 1, chunks.length, truthTable)),
     );
 
     const nodes = results.flat();
     if (nodes.length === 0) throw new Error("Gemini returned no nodes across all chunks");
 
-    return NextResponse.json({ nodes, chunks: chunks.length, tocCount: approvedChapters.length });
+    return NextResponse.json({ nodes, chunks: chunks.length, tocCount: truthTable.length });
   } catch (error) {
     console.error("[/api/ingest]", error);
     return NextResponse.json(
