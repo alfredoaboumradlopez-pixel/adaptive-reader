@@ -609,17 +609,14 @@ export default function HomePage() {
                 </div>
 
                 {/* Concept Anchor — a subtle primer, not the main event */}
-                <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-4 py-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-[10px] font-sans uppercase tracking-[0.28em] text-zinc-600">The Scene</p>
-                    <div className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${readingMasteryTone.badge}`}>
-                      <span className={`h-1 w-1 rounded-full ${readingMasteryTone.dot}`} />
-                      {readingMasteryTone.label}
-                    </div>
-                  </div>
-                  <p className="mt-2 font-serif text-sm leading-[1.65] text-zinc-400 sm:text-[0.9rem]">
+                <div className="flex items-start justify-between gap-4 px-1">
+                  <p className="font-serif text-sm italic leading-relaxed text-zinc-500 sm:text-[0.9rem]">
                     {libraryReadingNode.supportingContext}
                   </p>
+                  <div className={`shrink-0 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${readingMasteryTone.badge}`}>
+                    <span className={`h-1 w-1 rounded-full ${readingMasteryTone.dot}`} />
+                    {readingMasteryTone.label}
+                  </div>
                 </div>
 
                 {/* Sprint Canvas — one sprint at a time */}
