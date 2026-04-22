@@ -86,6 +86,40 @@ FINAL CHECK — run this before outputting
 
 Extract a node for EVERY major chapter or significant conceptual shift you find in the text. Do not stop at 5 or 6. Aim for 8 to 12 nodes — if the text contains 10 distinct chapters, produce 10 nodes. Thoroughness is the goal. Return nothing but the JSON array.`;
 
+const CHUNK_SIZE = 100_000;
+
+async function scanChunk(
+  ai: GoogleGenAI,
+  chunk: string,
+  part: number,
+  total: number,
+): Promise<Record<string, unknown>[]> {
+  const contents =
+    `${SYSTEM_PROMPT}\n\n` +
+    `IMPORTANT: This is Part ${part} of ${total} of the full book text. ` +
+    `Extract 4 to 5 core nodes from THIS SECTION ONLY. ` +
+    `Do not repeat concepts that appear in other parts. ` +
+    `Focus exclusively on the chapters and ideas present in the text below.\n\n` +
+    `BOOK TEXT — Part ${part}/${total}:\n${chunk}`;
+
+  const result = await ai.models.generateContent({
+    model: "gemini-2.5-pro",
+    contents,
+  });
+
+  let raw = (result.text ?? "").trim();
+  raw = raw.replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
+
+  const nodes = JSON.parse(raw);
+  if (!Array.isArray(nodes)) return [];
+
+  // Suffix IDs with part index to guarantee uniqueness across chunks
+  return (nodes as Record<string, unknown>[]).map((n, i) => ({
+    ...n,
+    id: `${(n.id as string) ?? `node_p${part}_${i}`}_p${part}`,
+  }));
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -95,30 +129,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Step 1: Extract text from PDF
+    // Step 1: Extract full text from PDF
     const buffer = await file.arrayBuffer();
-    let text = await extractText(buffer);
-    if (text.length > 120000) {
-      text = text.slice(0, 120000);
+    const fullText = await extractText(buffer);
+
+    // Step 2: Split into up to 3 chunks and scan in parallel
+    const chunks: string[] = [];
+    for (let i = 0; i < fullText.length && chunks.length < 3; i += CHUNK_SIZE) {
+      const chunk = fullText.slice(i, i + CHUNK_SIZE).trim();
+      if (chunk.length > 500) chunks.push(chunk); // skip near-empty tail chunks
     }
 
-    // Step 2: Send text to Gemini — no File API, pure text generation
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    const result = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
-      contents: `${SYSTEM_PROMPT}\n\nBOOK TEXT:\n${text}`,
-    });
+    const results = await Promise.all(
+      chunks.map((chunk, i) => scanChunk(ai, chunk, i + 1, chunks.length)),
+    );
 
-    // Step 3: Strip any accidental markdown fences and parse
-    let raw = (result.text ?? "").trim();
-    raw = raw.replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
-
-    const nodes = JSON.parse(raw);
-    if (!Array.isArray(nodes)) {
-      throw new Error("Gemini returned unexpected format — expected JSON array");
+    // Step 3: Merge all chunk results into one flat array
+    const nodes = results.flat();
+    if (nodes.length === 0) {
+      throw new Error("Gemini returned no nodes across all chunks");
     }
 
-    return NextResponse.json({ nodes });
+    return NextResponse.json({ nodes, chunks: chunks.length });
   } catch (error) {
     console.error("[/api/ingest]", error);
     return NextResponse.json(

@@ -167,6 +167,22 @@ export default function HomePage() {
     setCurrentSprintIndex(0);
   }, [libraryReadingNode?.id]);
 
+  useEffect(() => {
+    if (!isProcessingPdf) return;
+    const phases = [
+      "Scanning Part 1 / 3...",
+      "Scanning Part 2 / 3...",
+      "Scanning Part 3 / 3... Almost there.",
+    ];
+    let idx = 0;
+    setToastText(phases[0]);
+    const id = window.setInterval(() => {
+      idx = Math.min(idx + 1, phases.length - 1);
+      setToastText(phases[idx]);
+    }, 12000);
+    return () => window.clearInterval(id);
+  }, [isProcessingPdf]);
+
   const openIngestDialog = () => {
     fileInputRef.current?.click();
   };
@@ -1032,8 +1048,8 @@ export default function HomePage() {
 
         {toastText ? (
           <div className="pointer-events-auto absolute bottom-6 left-1/2 z-[150] -translate-x-1/2 rounded-xl border border-white/15 bg-zinc-900/75 px-4 py-2 text-sm text-zinc-100 shadow-2xl backdrop-blur-xl">
-            {isProcessingPdf ? "Processing..." : "Ready"}
-            <span className="ml-2 text-zinc-300">{toastText}</span>
+            {!isProcessingPdf && <span className="mr-2">Ready</span>}
+            <span className="text-zinc-300">{toastText}</span>
           </div>
         ) : null}
       </div>
