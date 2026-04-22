@@ -185,16 +185,18 @@ export default function HomePage() {
   useEffect(() => {
     if (!isProcessingPdf) return;
     const phases = [
-      "Scanning Part 1 / 3...",
-      "Scanning Part 2 / 3...",
-      "Scanning Part 3 / 3... Almost there.",
+      "Scanning Part 1 / 5...",
+      "Scanning Part 2 / 5...",
+      "Scanning Part 3 / 5...",
+      "Scanning Part 4 / 5...",
+      "Scanning Part 5 / 5... Almost there.",
     ];
     let idx = 0;
     setToastText(phases[0]);
     const id = window.setInterval(() => {
       idx = Math.min(idx + 1, phases.length - 1);
       setToastText(phases[idx]);
-    }, 12000);
+    }, 10000);
     return () => window.clearInterval(id);
   }, [isProcessingPdf]);
 
@@ -272,10 +274,19 @@ export default function HomePage() {
 
       let addedCount = 0;
       setGraphState((prev) => {
+        // Merge: existing nodes win over incoming duplicates
         const existingById = new Map(prev.nodes.map((n) => [n.id, n]));
         const toAdd = dedupedBatch.filter((n) => !existingById.has(n.id));
         addedCount = toAdd.length;
-        const updated = { nodes: [...prev.nodes, ...toAdd], links: prev.links };
+        // Sort entire merged array by chapter number extracted from canonical ID
+        const merged = [...prev.nodes, ...toAdd].sort((a, b) => {
+          const numA = parseInt(a.id.split("-").at(-1) ?? "0", 10);
+          const numB = parseInt(b.id.split("-").at(-1) ?? "0", 10);
+          // Group by book first, then chapter number
+          const bookCmp = a.bookTitle.localeCompare(b.bookTitle);
+          return bookCmp !== 0 ? bookCmp : numA - numB;
+        });
+        const updated = { nodes: merged, links: prev.links };
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
         return updated;
       });

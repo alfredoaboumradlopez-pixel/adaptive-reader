@@ -20,7 +20,7 @@ async function extractText(buffer: ArrayBuffer): Promise<string> {
   return result.pages.map((p) => p.text).join("\n");
 }
 
-const SYSTEM_PROMPT = `You are a Learning Architect. You distill books into a three-act psychological experience: Scene → Discovery → Truth. Brevity and restraint are your highest virtues. Your output renders in a premium interactive reader — every word is visible, every spoiler is fatal.
+const SYSTEM_PROMPT = `You are a Structural Scanner and Narrative Architect. You have two jobs: (1) find every chapter, and (2) distill each one into a three-act psychological experience — Scene → Discovery → Truth.
 
 Return ONLY a raw JSON array — no markdown, no code fences, no backticks, no preamble.
 
@@ -28,7 +28,15 @@ Each object is a Knowledge Node with these exact keys:
 "id", "bookTitle", "chapter", "supportingContext", "goldenThread", "narrativeSprints", "tags", "masteryStatus", "level"
 
 ════════════════════════════════════════
-ID + CHAPTER PROTOCOL (MANDATORY — read twice)
+LAW 1 — EXHAUSTIVE SCAN (NON-NEGOTIABLE)
+════════════════════════════════════════
+You are FORBIDDEN from skipping chapters. If the text contains a header, a numbered section, or a titled chapter — it must become a node.
+Do not consolidate. Do not merge. Do not summarize multiple chapters into one.
+One chapter header = one node. Every header you see in this text must appear in your output.
+If you are unsure whether something is a chapter, include it. Omission is the only error.
+
+════════════════════════════════════════
+LAW 2 — ID + CHAPTER PROTOCOL (MANDATORY)
 ════════════════════════════════════════
 The "chapter" field MUST follow this EXACT format: [Number]: [Short Title]
   CORRECT: "4: Capture"   "0: Introduction"   "12: The Final Gambit"
@@ -38,76 +46,76 @@ Special rules:
   Conclusion / Epilogue / Afterword             → "99: Conclusion"
 
 The "id" field MUST be formatted as [book-slug]-[chapter-number].
-  book-slug  = bookTitle lowercased, spaces → hyphens, all non-alphanumeric chars removed
-  chapter-number = the leading integer from the chapter field
+  book-slug        = bookTitle lowercased, spaces → hyphens, non-alphanumeric removed
+  chapter-number   = the leading integer from the chapter field
   EXAMPLE: bookTitle "Building a Second Brain", chapter "4: Capture" → id "building-a-second-brain-4"
   EXAMPLE: bookTitle "Zero to One", chapter "0: Introduction"       → id "zero-to-one-0"
-NEVER invent a random string. NEVER use the chapter title words in the id. Only [book-slug]-[N].
+NEVER use random strings. NEVER put chapter title words in the id. Only [book-slug]-[N].
 
 ════════════════════════════════════════
-ACT 1 — "supportingContext" (THE SCENE)
+LAW 3 — "supportingContext" (THE SCENE — 2 SENTENCES ONLY)
 ════════════════════════════════════════
-WORD LIMIT: 20 words maximum. Count them. If you exceed 20 words, cut until you don't.
-JOB: Describe the static state — the setting, the person, the moment — BEFORE the story begins. Show the world at rest. Leave a gap the reader must cross to find out what happens next.
-FORBIDDEN LOGIC: You may NOT use contrast logic. The words 'unlike', 'whereas', 'but', 'yet', 'however', 'while', 'though', 'although', 'despite', 'difference', 'contrast', 'divide' are banned.
-FORBIDDEN OUTCOME WORDS: 'prosperous', 'poor', 'rich', 'wealthy', 'success', 'failure', 'dangerous', 'safe', 'better', 'worse', 'explains', 'reveals', 'shows', 'proves'.
+Write EXACTLY 2 sentences. No more. No less.
+Job: Describe the static state — the setting, the person, the moment — BEFORE the story begins.
+Show the world at rest. Leave a gap the reader must cross.
+BANNED WORDS IN THIS FIELD: 'Chapter', 'Section', 'Summarize', 'Summary', 'unlike', 'whereas', 'but', 'yet', 'however', 'while', 'though', 'although', 'despite', 'difference', 'contrast', 'divide', 'prosperous', 'poor', 'rich', 'wealthy', 'success', 'failure', 'dangerous', 'safe', 'better', 'worse', 'explains', 'reveals', 'shows', 'proves'.
 
 --- FEW-SHOT EXAMPLES ---
 
-BAD (17 words — but FAILS because it reveals the contrast):
-"The city of Nogales is split by a fence — one side rich, one side poor."
-WHY IT FAILS: It hands the reader the punchline. 'Rich' and 'poor' kill all curiosity. The reader has nothing left to discover.
+BAD: "The city of Nogales is split by a fence — one side rich, one side poor."
+WHY IT FAILS: Reveals the contrast. 'Rich' and 'poor' kill all curiosity.
 
-GOOD (20 words — succeeds because it reveals nothing):
-"A fence runs through Nogales, dividing families who share the same ancestors, the same climate, and the same soil."
-WHY IT WORKS: Same people. Same place. Same everything. The reader thinks: 'wait — so what's different?' They have to read to find out.
+GOOD: "A fence runs through Nogales, dividing families who share the same ancestors, the same climate, and the same soil. No one from either side chose where they were born."
+WHY IT WORKS: Same place, same people — reader thinks: what's different? They must read to find out.
 
-BAD (describes a failing company):
-"Blockbuster ignored streaming and went bankrupt while Netflix thrived, showing how disruption destroys slow-moving incumbents."
-WHY IT FAILS: Reveals the entire story arc — failure, success, and the cause — in one sentence.
+BAD: "In 2004, Blockbuster ignored streaming and went bankrupt while Netflix thrived."
+WHY IT FAILS: Reveals the entire arc in one sentence.
 
-GOOD (describes a failing company):
-"In 2004, Blockbuster had 9,000 stores, 60,000 employees, and a $6 billion valuation."
-WHY IT WORKS: Describes the static peak. The reader doesn't yet know what's coming. The gap is open.
+GOOD: "In 2004, Blockbuster operated 9,000 stores, employed 60,000 people, and carried a $6 billion valuation. Reed Hastings had requested a meeting with their CEO three years earlier."
+WHY IT WORKS: Two facts. The second one opens a door. The reader has to walk through it.
 
 --- END EXAMPLES ---
 
 ════════════════════════════════════════
-ACT 2 — "narrativeSprints" (THE DISCOVERY)
+LAW 4 — "narrativeSprints" (THE DISCOVERY)
 ════════════════════════════════════════
 An array of EXACTLY 3 to 4 strings. Each string: 4 to 5 vivid sentences.
-- Sprint 1: Open with one concrete, specific scene or detail from the text. Ground the reader in a place, a person, a number. Make it tactile.
-- Sprint 2: Introduce the tension or mechanism using the author's ACTUAL vocabulary (e.g. 'inclusive institutions', 'creative destruction', 'zero to one'). Name the idea precisely.
-- Sprint 3–4: Develop with specific evidence — names, numbers, anecdotes from the book. Each sentence should reveal something new. Build to the edge of the truth without stating it.
-Voice: Write in the author's storytelling register — their rhythm, their specific word choices, their internal logic. Think 'Director's Cut': concentrated but soulful, immersive not clinical. No hedging. No filler ('it is important to note', 'this suggests that', 'one could argue').
+NO bullet points. NO numbered lists inside strings. Flowing prose only.
+
+- Sprint 1: Open with one concrete, specific scene or detail from the text. A place, a person, a number. Make it tactile and immediate.
+- Sprint 2: Introduce the core mechanism using the author's ACTUAL vocabulary. Name the idea with their exact term. ('inclusive institutions', 'creative destruction', 'PARA', 'progressive summarization', 'zero to one').
+- Sprint 3–4: Develop with specific evidence — names, numbers, anecdotes directly from the book. Each sentence reveals something new. Build to the edge of the truth without stating it.
+
+VOICE: Mirror the author's storytelling register. Contrarian and philosophical for Thiel. Tactical and empowering for Forte. Clinical and curious for Gladwell. No hedging. No filler phrases like 'it is important to note', 'this suggests that', 'one could argue'.
 
 ════════════════════════════════════════
-ACT 3 — "goldenThread" (THE TRUTH)
+LAW 5 — "goldenThread" (THE TRUTH)
 ════════════════════════════════════════
-EXACTLY 1 sentence. This is the ONLY place outcomes, causes, or judgments are permitted. It must land like the answer the reader has been chasing since the opening scene.
+EXACTLY 1 sentence. This is the ONLY place outcomes, causes, or judgments are permitted.
+It must land like the answer the reader has been chasing since the opening scene.
 
 ════════════════════════════════════════
 REMAINING FIELDS
 ════════════════════════════════════════
-"level"        — integer: 0 (Intro/Preface), 1 (core chapters), 2 (deep-dive/case-study/appendix)
+"level"        — integer: 0 (Intro/Preface/Prologue), 1 (core narrative chapters), 2 (deep-dive/technical/appendix)
 "tags"         — 2 to 4 keyword strings
 "masteryStatus"— always "Red"
 
 ════════════════════════════════════════
-FINAL CHECK — run this before outputting
+FINAL CHECK — run before outputting
 ════════════════════════════════════════
-1. Count the words in supportingContext. More than 20? Cut.
-2. Read supportingContext in isolation. Does it hint at any outcome, cause, or contrast? Rewrite as pure static scene.
-3. Does supportingContext contain any banned word? Rewrite.
-4. Do the sprints use specific names, numbers, or quotes from the text? If not, make them concrete.
-5. Does goldenThread resolve the scene's curiosity gap? If not, sharpen it.
-6. Does every "chapter" follow "[N]: [Title]"? No "Chapter" prefix allowed. Fix any that don't.
-7. Does every "id" follow "[book-slug]-[N]"? Fix any that don't.
-8. Does every node have a "level" of 0, 1, or 2? Assign if missing.
+1. Count every chapter header you saw. Does your output have a node for each one? Add any missing.
+2. supportingContext: exactly 2 sentences? Contains any banned word? Fix it.
+3. Does every "chapter" follow "[N]: [Title]"? No "Chapter" prefix. Fix any that don't.
+4. Does every "id" follow "[book-slug]-[N]"? Fix any that don't.
+5. Do the sprints use the author's specific vocabulary and concrete evidence? If not, rewrite.
+6. Does goldenThread resolve the scene's curiosity gap? If not, sharpen it.
+7. Does every node have a valid "level" of 0, 1, or 2? Assign if missing.
 
-Extract a node for EVERY major chapter or significant conceptual shift you find in the text. Do not stop at 5 or 6. Aim for 8 to 12 nodes — if the text contains 10 distinct chapters, produce 10 nodes. Thoroughness is the goal. Return nothing but the JSON array.`;
+Return nothing but the JSON array.`;
 
-const CHUNK_SIZE = 100_000;
+const CHUNK_SIZE = 60_000;
+const MAX_CHUNKS = 5;
 
 async function scanChunk(
   ai: GoogleGenAI,
@@ -118,14 +126,15 @@ async function scanChunk(
   const contents =
     `${SYSTEM_PROMPT}\n\n` +
     `IMPORTANT: This is Part ${part} of ${total} of the full book text. ` +
-    `Extract 4 to 5 core nodes from THIS SECTION ONLY. ` +
-    `Do not repeat concepts that appear in other parts. ` +
-    `Focus exclusively on the chapters and ideas present in the text below.\n\n` +
+    `Your ONLY job is to extract ALL chapters and sections visible in this text. ` +
+    `Do NOT skip any chapter. Do NOT merge chapters. One header = one node. ` +
+    `Focus exclusively on the chapters and sections present in the text below.\n\n` +
     `BOOK TEXT — Part ${part}/${total}:\n${chunk}`;
 
   const result = await ai.models.generateContent({
     model: "gemini-2.5-pro",
     contents,
+    config: { temperature: 0.2 },
   });
 
   let raw = (result.text ?? "").trim();
@@ -134,6 +143,7 @@ async function scanChunk(
   const nodes = JSON.parse(raw);
   if (!Array.isArray(nodes)) return [];
 
+  // Server-side ID override — canonical [book-slug]-[chapter-number] regardless of Gemini output
   return (nodes as Record<string, unknown>[]).map((n) => {
     const bookTitle = typeof n.bookTitle === "string" ? n.bookTitle : "unknown";
     const chapter = typeof n.chapter === "string" ? n.chapter : "";
@@ -147,13 +157,11 @@ async function scanChunk(
     const chapterNumMatch = chapter.replace(/^chapter\s+/i, "").match(/^(\d+)/);
     const chapterNum = chapterNumMatch
       ? chapterNumMatch[1]
-      : // Task 4 fallback: deterministic hash of the chapter title
-        String(
+      : String(
           [...chapter].reduce((h, c) => ((h * 31 + c.charCodeAt(0)) >>> 0), 0).toString(36),
         );
 
-    const id = `${bookSlug}-${chapterNum}`;
-    return { ...n, id };
+    return { ...n, id: `${bookSlug}-${chapterNum}` };
   });
 }
 
@@ -166,15 +174,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Step 1: Extract full text from PDF
     const buffer = await file.arrayBuffer();
     const fullText = await extractText(buffer);
 
-    // Step 2: Split into up to 3 chunks and scan in parallel
     const chunks: string[] = [];
-    for (let i = 0; i < fullText.length && chunks.length < 3; i += CHUNK_SIZE) {
+    for (let i = 0; i < fullText.length && chunks.length < MAX_CHUNKS; i += CHUNK_SIZE) {
       const chunk = fullText.slice(i, i + CHUNK_SIZE).trim();
-      if (chunk.length > 500) chunks.push(chunk); // skip near-empty tail chunks
+      if (chunk.length > 500) chunks.push(chunk);
     }
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -182,7 +188,6 @@ export async function POST(request: NextRequest) {
       chunks.map((chunk, i) => scanChunk(ai, chunk, i + 1, chunks.length)),
     );
 
-    // Step 3: Merge all chunk results into one flat array
     const nodes = results.flat();
     if (nodes.length === 0) {
       throw new Error("Gemini returned no nodes across all chunks");
