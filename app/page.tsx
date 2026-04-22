@@ -611,7 +611,7 @@ export default function HomePage() {
                 {/* Concept Anchor — a subtle primer, not the main event */}
                 <div className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-4 py-3">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-[10px] font-sans uppercase tracking-[0.28em] text-zinc-600">The Setup</p>
+                    <p className="text-[10px] font-sans uppercase tracking-[0.28em] text-zinc-600">The Scene</p>
                     <div className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${readingMasteryTone.badge}`}>
                       <span className={`h-1 w-1 rounded-full ${readingMasteryTone.dot}`} />
                       {readingMasteryTone.label}
