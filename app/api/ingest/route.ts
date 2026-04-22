@@ -102,6 +102,24 @@ REMAINING FIELDS
 "masteryStatus"— always "Red"
 
 ════════════════════════════════════════
+LAW 6 — CONTENT-ONLY FILTER
+════════════════════════════════════════
+You are FORBIDDEN from creating nodes for administrative or non-conceptual sections.
+
+BLACKLISTED SECTION TYPES (skip these entirely — produce no node):
+  'Acknowledgments', 'Index', 'Illustration Credits', 'Bibliography',
+  'References', 'About the Author', 'Praise for...', 'Further Reading',
+  'Also by the Author', 'Copyright', 'Permissions', 'Table of Contents'.
+  'Appendix' — skip UNLESS it contains a standalone conceptual argument.
+
+THE RULE: If a section has no Golden Thread — no insight that contributes to
+the book's core thesis — it does not exist for our purposes. Skip it.
+
+SEQUENCE INTEGRITY: Do NOT assign high fake numbers (like 98, 100, 101) to
+administrative sections. If you skip a section, the chapter numbering simply
+moves on. Do not fill gaps with noise.
+
+════════════════════════════════════════
 FINAL CHECK — run before outputting
 ════════════════════════════════════════
 1. Count every chapter header you saw. Does your output have a node for each one? Add any missing.
@@ -111,6 +129,7 @@ FINAL CHECK — run before outputting
 5. Do the sprints use the author's specific vocabulary and concrete evidence? If not, rewrite.
 6. Does goldenThread resolve the scene's curiosity gap? If not, sharpen it.
 7. Does every node have a valid "level" of 0, 1, or 2? Assign if missing.
+8. Does your output contain any blacklisted section (Acknowledgments, Index, Bibliography, etc.)? Remove it.
 
 Return nothing but the JSON array.`;
 
