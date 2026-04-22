@@ -11,6 +11,7 @@ export type EmpireNode = {
   sprintCount: number;
   masteryStatus: MasteryStatus;
   color: string;
+  level: 0 | 1 | 2;
 };
 
 export type EmpireLink = {
@@ -39,6 +40,7 @@ export const knowledgeGraphData: { nodes: EmpireNode[]; links: EmpireLink[] } = 
       masteryStatus: "Green",
       sprintCount: 8,
       color: "#10B981",
+      level: 1,
     },
     {
       id: "cost_ch3",
@@ -58,6 +60,7 @@ export const knowledgeGraphData: { nodes: EmpireNode[]; links: EmpireLink[] } = 
       masteryStatus: "Yellow",
       sprintCount: 6,
       color: "#F59E0B",
+      level: 1,
     },
     {
       id: "cost_ch1",
@@ -77,6 +80,7 @@ export const knowledgeGraphData: { nodes: EmpireNode[]; links: EmpireLink[] } = 
       masteryStatus: "Red",
       sprintCount: 4,
       color: "#EF4444",
+      level: 1,
     },
     {
       id: "z21_ch3",
@@ -96,6 +100,7 @@ export const knowledgeGraphData: { nodes: EmpireNode[]; links: EmpireLink[] } = 
       masteryStatus: "Green",
       sprintCount: 7,
       color: "#10B981",
+      level: 1,
     },
   ],
   links: [

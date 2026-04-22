@@ -25,7 +25,7 @@ const SYSTEM_PROMPT = `You are a Learning Architect. You distill books into a th
 Return ONLY a raw JSON array — no markdown, no code fences, no backticks, no preamble.
 
 Each object is a Knowledge Node with these exact keys:
-"id", "bookTitle", "chapter", "supportingContext", "goldenThread", "narrativeSprints", "tags", "masteryStatus"
+"id", "bookTitle", "chapter", "supportingContext", "goldenThread", "narrativeSprints", "tags", "masteryStatus", "level"
 
 ════════════════════════════════════════
 ACT 1 — "supportingContext" (THE SCENE)
@@ -72,6 +72,24 @@ EXACTLY 1 sentence. This is the ONLY place outcomes, causes, or judgments are pe
 ════════════════════════════════════════
 REMAINING FIELDS
 ════════════════════════════════════════
+════════════════════════════════════════
+CHAPTER TITLE PROTOCOL — "chapter" field
+════════════════════════════════════════
+EVERY chapter value MUST follow this exact format: [Number]: [Short Title]
+Examples: "1: The Origin", "4: Capture", "12: The Final Gambit"
+Special cases:
+  - Introduction or Preface → "0: Introduction"
+  - Conclusion or Epilogue  → "99: Conclusion"
+NEVER write "Chapter 4", "Section IV", or any other format. Only "[N]: [Title]".
+
+════════════════════════════════════════
+LEVEL PROTOCOL — "level" field
+════════════════════════════════════════
+Assign an integer level to each node:
+  0 — Introduction, Preface, Prologue, Foreword
+  1 — Core narrative or conceptual chapters (the main argument)
+  2 — Deep-dive, technical, case-study, or appendix chapters
+
 "tags"         — 2 to 4 keyword strings
 "masteryStatus"— always "Red"
 
@@ -83,6 +101,8 @@ FINAL CHECK — run this before outputting
 3. Does supportingContext contain any banned word? Rewrite.
 4. Do the sprints use specific names, numbers, or quotes from the text? If not, make them concrete.
 5. Does goldenThread resolve the scene's curiosity gap? If not, sharpen it.
+6. Does every "chapter" value follow the "[N]: [Title]" format? Fix any that don't.
+7. Does every node have a valid "level" of 0, 1, or 2? Assign if missing.
 
 Extract a node for EVERY major chapter or significant conceptual shift you find in the text. Do not stop at 5 or 6. Aim for 8 to 12 nodes — if the text contains 10 distinct chapters, produce 10 nodes. Thoroughness is the goal. Return nothing but the JSON array.`;
 
@@ -115,11 +135,15 @@ async function scanChunk(
 
   return (nodes as Record<string, unknown>[]).map((n) => {
     const chapter = typeof n.chapter === "string" ? n.chapter : "";
-    const slug = chapter
+    // Normalise "Chapter 4: Capture" → "4: Capture" before slugifying
+    const normalised = chapter.replace(/^chapter\s+/i, "");
+    const slug = normalised
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/[^a-z0-9\s:-]/g, "")
+      .replace(/:\s*/g, "-")
       .trim()
-      .replace(/\s+/g, "-");
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
     return { ...n, id: slug || `node_p${part}_${Math.random().toString(36).slice(2)}` };
   });
 }

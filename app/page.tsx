@@ -49,6 +49,21 @@ const masteryStyles: Record<
 
 const LOCAL_STORAGE_KEY = "adaptive-reader-data";
 
+function slugify(text: string): string {
+  return text
+    .replace(/^chapter\s+/i, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s:-]/g, "")
+    .replace(/:\s*/g, "-")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+function chapterNum(chapter: string): number {
+  return parseInt(chapter.match(/\d+/)?.[0] ?? "0", 10);
+}
+
 const statusColor: Record<MasteryStatus, string> = {
   Green: "#10B981",
   Yellow: "#F59E0B",
@@ -227,24 +242,31 @@ export default function HomePage() {
         nodes: Partial<EmpireNode>[];
       };
 
-      const newNodes: EmpireNode[] = rawNodes.map((n) => ({
-        sprintCount: 0,
-        color: "#EF4444",
-        tags: [],
-        narrativeSprints: [],
-        supportingContext: "",
-        goldenThread: "",
-        ...n,
-        id: n.id ?? `node_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-        bookTitle: n.bookTitle ?? "Unknown",
-        chapter: n.chapter ?? "Unknown",
-        masteryStatus: "Red",
-      }));
+      const newNodes: EmpireNode[] = rawNodes.map((n) => {
+        const chapter = (n.chapter ?? "Unknown") as string;
+        const bookTitle = (n.bookTitle ?? "Unknown") as string;
+        const num = chapterNum(chapter);
+        const defaultLevel: 0 | 1 | 2 = num === 0 ? 0 : num >= 90 ? 2 : 1;
+        return {
+          sprintCount: 0,
+          color: "#EF4444",
+          tags: [],
+          narrativeSprints: [],
+          supportingContext: "",
+          goldenThread: "",
+          ...n,
+          id: n.id ?? `node_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+          bookTitle,
+          chapter,
+          masteryStatus: "Red" as MasteryStatus,
+          level: (n.level as 0 | 1 | 2) ?? defaultLevel,
+        };
+      });
 
-      // Deduplicate within the new batch first (same chapter title appearing in multiple chunks)
+      // Deduplicate within batch first (same chapter from multiple chunks)
       const seenInBatch = new Set<string>();
       const dedupedWithinBatch = newNodes.filter((n) => {
-        const key = `${n.bookTitle}::${n.chapter.toLowerCase().trim()}`;
+        const key = `${n.bookTitle}::${slugify(n.chapter)}`;
         if (seenInBatch.has(key)) return false;
         seenInBatch.add(key);
         return true;
@@ -252,11 +274,11 @@ export default function HomePage() {
 
       let addedCount = 0;
       setGraphState((prev) => {
-        const existingChapters = new Set(
-          prev.nodes.map((n) => `${n.bookTitle}::${n.chapter.toLowerCase().trim()}`),
+        const existingSlugs = new Set(
+          prev.nodes.map((n) => `${n.bookTitle}::${slugify(n.chapter)}`),
         );
         const dedupedNodes = dedupedWithinBatch.filter(
-          (n) => !existingChapters.has(`${n.bookTitle}::${n.chapter.toLowerCase().trim()}`),
+          (n) => !existingSlugs.has(`${n.bookTitle}::${slugify(n.chapter)}`),
         );
         addedCount = dedupedNodes.length;
         const updated = { nodes: [...prev.nodes, ...dedupedNodes], links: prev.links };
@@ -448,11 +470,9 @@ export default function HomePage() {
   const selectedBookNodes = useMemo(() => {
     if (!selectedBook) return [];
     const nodes = graphState.nodes.filter((node) => node.bookTitle === selectedBook);
-    return nodes.sort((a, b) => {
-      const numA = parseInt(a.chapter.match(/\d+/)?.[0] ?? "0", 10);
-      const numB = parseInt(b.chapter.match(/\d+/)?.[0] ?? "0", 10);
-      return numA - numB || a.chapter.localeCompare(b.chapter);
-    });
+    return [...nodes].sort(
+      (a, b) => chapterNum(a.chapter) - chapterNum(b.chapter) || a.chapter.localeCompare(b.chapter),
+    );
   }, [graphState.nodes, selectedBook]);
 
   return (
