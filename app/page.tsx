@@ -263,25 +263,19 @@ export default function HomePage() {
         };
       });
 
-      // Deduplicate within batch first (same chapter from multiple chunks)
-      const seenInBatch = new Set<string>();
-      const dedupedWithinBatch = newNodes.filter((n) => {
-        const key = `${n.bookTitle}::${slugify(n.chapter)}`;
-        if (seenInBatch.has(key)) return false;
-        seenInBatch.add(key);
-        return true;
-      });
+      // First-in-wins dedup within this batch by canonical ID
+      const batchById = new Map<string, EmpireNode>();
+      for (const n of newNodes) {
+        if (!batchById.has(n.id)) batchById.set(n.id, n);
+      }
+      const dedupedBatch = Array.from(batchById.values());
 
       let addedCount = 0;
       setGraphState((prev) => {
-        const existingSlugs = new Set(
-          prev.nodes.map((n) => `${n.bookTitle}::${slugify(n.chapter)}`),
-        );
-        const dedupedNodes = dedupedWithinBatch.filter(
-          (n) => !existingSlugs.has(`${n.bookTitle}::${slugify(n.chapter)}`),
-        );
-        addedCount = dedupedNodes.length;
-        const updated = { nodes: [...prev.nodes, ...dedupedNodes], links: prev.links };
+        const existingById = new Map(prev.nodes.map((n) => [n.id, n]));
+        const toAdd = dedupedBatch.filter((n) => !existingById.has(n.id));
+        addedCount = toAdd.length;
+        const updated = { nodes: [...prev.nodes, ...toAdd], links: prev.links };
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
         return updated;
       });
@@ -470,9 +464,12 @@ export default function HomePage() {
   const selectedBookNodes = useMemo(() => {
     if (!selectedBook) return [];
     const nodes = graphState.nodes.filter((node) => node.bookTitle === selectedBook);
-    return [...nodes].sort(
-      (a, b) => chapterNum(a.chapter) - chapterNum(b.chapter) || a.chapter.localeCompare(b.chapter),
-    );
+    return [...nodes].sort((a, b) => {
+      // Sort by the numeric suffix of the canonical ID (e.g. "basb-4" → 4)
+      const numA = parseInt(a.id.split("-").at(-1) ?? "0", 10);
+      const numB = parseInt(b.id.split("-").at(-1) ?? "0", 10);
+      return numA - numB || a.chapter.localeCompare(b.chapter);
+    });
   }, [graphState.nodes, selectedBook]);
 
   return (

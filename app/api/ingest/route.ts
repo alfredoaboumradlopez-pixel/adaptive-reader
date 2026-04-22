@@ -28,6 +28,23 @@ Each object is a Knowledge Node with these exact keys:
 "id", "bookTitle", "chapter", "supportingContext", "goldenThread", "narrativeSprints", "tags", "masteryStatus", "level"
 
 ════════════════════════════════════════
+ID + CHAPTER PROTOCOL (MANDATORY — read twice)
+════════════════════════════════════════
+The "chapter" field MUST follow this EXACT format: [Number]: [Short Title]
+  CORRECT: "4: Capture"   "0: Introduction"   "12: The Final Gambit"
+  FORBIDDEN: "Chapter 4"   "Section IV"   "Chapter Four: Capture"   "Capture"
+Special rules:
+  Introduction / Preface / Prologue / Foreword → "0: Introduction"
+  Conclusion / Epilogue / Afterword             → "99: Conclusion"
+
+The "id" field MUST be formatted as [book-slug]-[chapter-number].
+  book-slug  = bookTitle lowercased, spaces → hyphens, all non-alphanumeric chars removed
+  chapter-number = the leading integer from the chapter field
+  EXAMPLE: bookTitle "Building a Second Brain", chapter "4: Capture" → id "building-a-second-brain-4"
+  EXAMPLE: bookTitle "Zero to One", chapter "0: Introduction"       → id "zero-to-one-0"
+NEVER invent a random string. NEVER use the chapter title words in the id. Only [book-slug]-[N].
+
+════════════════════════════════════════
 ACT 1 — "supportingContext" (THE SCENE)
 ════════════════════════════════════════
 WORD LIMIT: 20 words maximum. Count them. If you exceed 20 words, cut until you don't.
@@ -72,24 +89,7 @@ EXACTLY 1 sentence. This is the ONLY place outcomes, causes, or judgments are pe
 ════════════════════════════════════════
 REMAINING FIELDS
 ════════════════════════════════════════
-════════════════════════════════════════
-CHAPTER TITLE PROTOCOL — "chapter" field
-════════════════════════════════════════
-EVERY chapter value MUST follow this exact format: [Number]: [Short Title]
-Examples: "1: The Origin", "4: Capture", "12: The Final Gambit"
-Special cases:
-  - Introduction or Preface → "0: Introduction"
-  - Conclusion or Epilogue  → "99: Conclusion"
-NEVER write "Chapter 4", "Section IV", or any other format. Only "[N]: [Title]".
-
-════════════════════════════════════════
-LEVEL PROTOCOL — "level" field
-════════════════════════════════════════
-Assign an integer level to each node:
-  0 — Introduction, Preface, Prologue, Foreword
-  1 — Core narrative or conceptual chapters (the main argument)
-  2 — Deep-dive, technical, case-study, or appendix chapters
-
+"level"        — integer: 0 (Intro/Preface), 1 (core chapters), 2 (deep-dive/case-study/appendix)
 "tags"         — 2 to 4 keyword strings
 "masteryStatus"— always "Red"
 
@@ -101,8 +101,9 @@ FINAL CHECK — run this before outputting
 3. Does supportingContext contain any banned word? Rewrite.
 4. Do the sprints use specific names, numbers, or quotes from the text? If not, make them concrete.
 5. Does goldenThread resolve the scene's curiosity gap? If not, sharpen it.
-6. Does every "chapter" value follow the "[N]: [Title]" format? Fix any that don't.
-7. Does every node have a valid "level" of 0, 1, or 2? Assign if missing.
+6. Does every "chapter" follow "[N]: [Title]"? No "Chapter" prefix allowed. Fix any that don't.
+7. Does every "id" follow "[book-slug]-[N]"? Fix any that don't.
+8. Does every node have a "level" of 0, 1, or 2? Assign if missing.
 
 Extract a node for EVERY major chapter or significant conceptual shift you find in the text. Do not stop at 5 or 6. Aim for 8 to 12 nodes — if the text contains 10 distinct chapters, produce 10 nodes. Thoroughness is the goal. Return nothing but the JSON array.`;
 
@@ -134,17 +135,25 @@ async function scanChunk(
   if (!Array.isArray(nodes)) return [];
 
   return (nodes as Record<string, unknown>[]).map((n) => {
+    const bookTitle = typeof n.bookTitle === "string" ? n.bookTitle : "unknown";
     const chapter = typeof n.chapter === "string" ? n.chapter : "";
-    // Normalise "Chapter 4: Capture" → "4: Capture" before slugifying
-    const normalised = chapter.replace(/^chapter\s+/i, "");
-    const slug = normalised
+
+    const bookSlug = bookTitle
       .toLowerCase()
-      .replace(/[^a-z0-9\s:-]/g, "")
-      .replace(/:\s*/g, "-")
+      .replace(/[^a-z0-9\s]/g, "")
       .trim()
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-");
-    return { ...n, id: slug || `node_p${part}_${Math.random().toString(36).slice(2)}` };
+      .replace(/\s+/g, "-");
+
+    const chapterNumMatch = chapter.replace(/^chapter\s+/i, "").match(/^(\d+)/);
+    const chapterNum = chapterNumMatch
+      ? chapterNumMatch[1]
+      : // Task 4 fallback: deterministic hash of the chapter title
+        String(
+          [...chapter].reduce((h, c) => ((h * 31 + c.charCodeAt(0)) >>> 0), 0).toString(36),
+        );
+
+    const id = `${bookSlug}-${chapterNum}`;
+    return { ...n, id };
   });
 }
 
