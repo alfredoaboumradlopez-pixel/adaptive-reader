@@ -171,6 +171,24 @@ export default function HomePage() {
     fileInputRef.current?.click();
   };
 
+  const deleteBook = (bookTitle: string) => {
+    if (!window.confirm(`Remove "${bookTitle}" from your Empire?`)) return;
+    setGraphState((prev) => {
+      const updated = {
+        nodes: prev.nodes.filter((n) => n.bookTitle !== bookTitle),
+        links: prev.links.filter(
+          (l) =>
+            !prev.nodes.some(
+              (n) => n.bookTitle === bookTitle && (n.id === l.source || n.id === l.target),
+            ),
+        ),
+      };
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+    setSelectedBook(null);
+  };
+
   const handleFileUpload = async (file: File) => {
     setIsProcessingPdf(true);
     setToastText(`Processing "${file.name}"...`);
@@ -497,31 +515,51 @@ export default function HomePage() {
                 {!selectedBook ? (
                   <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {bookRoster.map((book) => (
-                      <button
+                      <div
                         key={book.bookTitle}
-                        type="button"
-                        onClick={() => setSelectedBook(book.bookTitle)}
-                        className="rounded-2xl border border-white/15 bg-zinc-900/50 p-5 text-left shadow-lg backdrop-blur-xl transition hover:bg-zinc-900/70"
+                        className="group relative rounded-2xl border border-white/15 bg-zinc-900/50 p-5 shadow-lg backdrop-blur-xl transition hover:bg-zinc-900/70"
                       >
-                        <p className="text-lg font-semibold tracking-tight text-zinc-100">
-                          {book.bookTitle}
-                        </p>
-                        <p className="mt-1 text-sm text-zinc-400">
-                          {book.totalNodes} chapter nodes
-                        </p>
-                        <p className="mt-4 text-xs uppercase tracking-[0.2em] text-zinc-500">
-                          Mastery
-                        </p>
-                        <div className="mt-2 h-2 w-full rounded-full bg-zinc-800">
-                          <div
-                            className="h-2 rounded-full bg-emerald-400 transition-all"
-                            style={{ width: `${book.masteryPercent}%` }}
-                          />
-                        </div>
-                        <p className="mt-2 text-sm text-zinc-300">
-                          {book.masteryPercent}% Green ({book.greenNodes}/{book.totalNodes})
-                        </p>
-                      </button>
+                        {/* Delete button */}
+                        <button
+                          type="button"
+                          onClick={() => deleteBook(book.bookTitle)}
+                          className="absolute right-3 top-3 rounded-lg p-1.5 text-zinc-600 opacity-0 transition hover:text-rose-400 group-hover:opacity-100"
+                          aria-label={`Delete ${book.bookTitle}`}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <path d="M10 11v6M14 11v6" />
+                            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                          </svg>
+                        </button>
+
+                        {/* Card body — click to open */}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedBook(book.bookTitle)}
+                          className="w-full text-left"
+                        >
+                          <p className="pr-6 text-lg font-semibold tracking-tight text-zinc-100">
+                            {book.bookTitle}
+                          </p>
+                          <p className="mt-1 text-sm text-zinc-400">
+                            {book.totalNodes} chapter nodes
+                          </p>
+                          <p className="mt-4 text-xs uppercase tracking-[0.2em] text-zinc-500">
+                            Mastery
+                          </p>
+                          <div className="mt-2 h-2 w-full rounded-full bg-zinc-800">
+                            <div
+                              className="h-2 rounded-full bg-emerald-400 transition-all"
+                              style={{ width: `${book.masteryPercent}%` }}
+                            />
+                          </div>
+                          <p className="mt-2 text-sm text-zinc-300">
+                            {book.masteryPercent}% Green ({book.greenNodes}/{book.totalNodes})
+                          </p>
+                        </button>
+                      </div>
                     ))}
                   </div>
                 ) : (
