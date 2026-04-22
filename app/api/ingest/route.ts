@@ -58,11 +58,11 @@ WHY IT WORKS: Describes the static peak. The reader doesn't yet know what's comi
 ════════════════════════════════════════
 ACT 2 — "narrativeSprints" (THE DISCOVERY)
 ════════════════════════════════════════
-An array of EXACTLY 3 to 4 strings. Each string: MAX 3 sentences.
-- Sprint 1: One concrete scene or specific detail from the text. Ground the reader.
-- Sprint 2: Introduce the tension or mechanism using the author's ACTUAL vocabulary (e.g. 'inclusive institutions', 'creative destruction', 'zero to one').
-- Sprint 3–4: Develop with specific evidence — names, numbers, examples from the book. Build to the edge of the truth without stating it.
-Voice: author's confident, direct register. Short sentences. No hedging. No filler ('it is important to note', 'this suggests that', 'one could argue').
+An array of EXACTLY 3 to 4 strings. Each string: 4 to 5 vivid sentences.
+- Sprint 1: Open with one concrete, specific scene or detail from the text. Ground the reader in a place, a person, a number. Make it tactile.
+- Sprint 2: Introduce the tension or mechanism using the author's ACTUAL vocabulary (e.g. 'inclusive institutions', 'creative destruction', 'zero to one'). Name the idea precisely.
+- Sprint 3–4: Develop with specific evidence — names, numbers, anecdotes from the book. Each sentence should reveal something new. Build to the edge of the truth without stating it.
+Voice: Write in the author's storytelling register — their rhythm, their specific word choices, their internal logic. Think 'Director's Cut': concentrated but soulful, immersive not clinical. No hedging. No filler ('it is important to note', 'this suggests that', 'one could argue').
 
 ════════════════════════════════════════
 ACT 3 — "goldenThread" (THE TRUTH)
@@ -84,7 +84,7 @@ FINAL CHECK — run this before outputting
 4. Do the sprints use specific names, numbers, or quotes from the text? If not, make them concrete.
 5. Does goldenThread resolve the scene's curiosity gap? If not, sharpen it.
 
-Extract 4 to 7 concepts. Return nothing but the JSON array.`;
+Extract a node for EVERY major chapter or significant conceptual shift you find in the text. Do not stop at 5 or 6. Aim for 8 to 12 nodes — if the text contains 10 distinct chapters, produce 10 nodes. Thoroughness is the goal. Return nothing but the JSON array.`;
 
 export async function POST(request: NextRequest) {
   try {
@@ -98,8 +98,8 @@ export async function POST(request: NextRequest) {
     // Step 1: Extract text from PDF
     const buffer = await file.arrayBuffer();
     let text = await extractText(buffer);
-    if (text.length > 60000) {
-      text = text.slice(0, 60000);
+    if (text.length > 120000) {
+      text = text.slice(0, 120000);
     }
 
     // Step 2: Send text to Gemini — no File API, pure text generation

@@ -588,7 +588,7 @@ export default function HomePage() {
                       </div>
                     </header>
 
-                    <ul className="mt-8 divide-y divide-white/10">
+                    <ul className="mt-8 divide-y divide-white/10 overflow-y-auto">
                       {selectedBookNodes.map((node) => (
                         <li key={node.id}>
                           <button
