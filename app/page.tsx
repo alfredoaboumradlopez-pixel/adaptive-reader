@@ -252,19 +252,27 @@ export default function HomePage() {
             switch (event.type) {
               case "toc":
                 totalChapters = (event.totalChapters as number) ?? 0;
-                setToastText(`Extracting Chapter 1 / ${totalChapters}...`);
+                setToastText(`Step 1: Blueprint mapped — ${totalChapters} chapters found.`);
                 break;
-              case "chapter":
-                chaptersDone++;
+              case "chapter": {
                 rawCollected.push(event.node as Record<string, unknown>);
+                const n = (event.completedCount as number) ?? ++chaptersDone;
+                const title = (event.chapterTitle as string) ?? "";
                 setToastText(
-                  chaptersDone < totalChapters
-                    ? `Extracting Chapter ${chaptersDone + 1} / ${totalChapters}...`
-                    : "Colonizing Empire...",
+                  `Step 2: Colonizing Chapter ${n} of ${totalChapters}${title ? ` (${title})` : ""}...`,
                 );
                 break;
+              }
               case "skip":
                 chaptersDone++;
+                break;
+              case "retry":
+                setToastText(
+                  `Step 2: Recovery pass — ${(event.missingCount as number) ?? 0} chapter(s) retrying...`,
+                );
+                break;
+              case "done":
+                setToastText("Step 3: Colonizing Empire...");
                 break;
               case "error":
                 throw new Error((event.message as string) ?? "Ingestion failed");

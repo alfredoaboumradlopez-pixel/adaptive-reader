@@ -31,9 +31,10 @@ type TocEntry = { num: number; title: string };
 
 export type StreamEvent =
   | { type: "toc"; masterChapters: TocEntry[]; authorPersona: string; powerWords: string[]; totalChapters: number }
-  | { type: "chapter"; node: Record<string, unknown>; chapterNum: number }
-  | { type: "skip"; chapterNum: number; reason: string }
-  | { type: "done"; total: number }
+  | { type: "chapter"; node: Record<string, unknown>; chapterNum: number; chapterTitle: string; completedCount: number }
+  | { type: "skip"; chapterNum: number; chapterTitle: string; reason: string }
+  | { type: "retry"; missingCount: number }
+  | { type: "done"; total: number; extracted: number }
   | { type: "error"; message: string };
 
 // ─────────────────────────────────────────────────────────────
@@ -209,11 +210,19 @@ BAD EXAMPLE:
 "Blockbuster ignored streaming and went bankrupt while Netflix thrived."
 
 ━━━━━━━━━━━━━━━━━━━━━━
+⚠️  ONE-NODE RULE — READ THIS BEFORE WRITING ANYTHING
+━━━━━━━━━━━━━━━━━━━━━━
+You are extracting EXACTLY ONE chapter. Your entire response is ONE JSON object — never an array.
+Sub-headers, sub-sections, call-out boxes, bold headings, and any internal structure of this chapter
+are FUEL for the Sprints. They are NOT nodes. They are NOT objects. They do not exist as output.
+ONE chapter → ONE JSON object. If you write an array or more than one object, you have failed.
+
+━━━━━━━━━━━━━━━━━━━━━━
 SPRINTS — "narrativeSprints" — EXACTLY 3 TO 4 STRINGS
 ━━━━━━━━━━━━━━━━━━━━━━
 Each string: 4 to 5 sentences of flowing prose. NO bullet points. NO numbered lists.
-Sub-sections within this chapter are the fuel for different Sprints — they do NOT become separate nodes.
-If this chapter has sub-sections A, B, C → Sprint 1 covers A, Sprint 2 covers B, Sprint 3 covers C.
+Absorb ALL sub-sections into the Sprints of this single node.
+If this chapter has sub-sections A, B, C → Sprint 1 distills A, Sprint 2 distills B, Sprint 3 distills C.
 
 Sprint 1: Open with one concrete, tactile scene — a place, a person, a number from this chapter.
 Sprint 2: Name the core mechanism using the author's EXACT vocabulary — prioritize the Power Words listed above.
@@ -264,6 +273,10 @@ async function extractChapter(
 
   const parsed = JSON.parse(raw) as Record<string, unknown>;
 
+  // Task 5: Golden Thread Validation — node is invalid without it
+  const goldenThread = typeof parsed.goldenThread === "string" ? parsed.goldenThread.trim() : "";
+  if (!goldenThread) return null; // triggers retry
+
   // Server-side ID override: always canonical [book-slug]-[chapter-number]
   const bookTitle = typeof parsed.bookTitle === "string" ? parsed.bookTitle : "unknown";
   const bookSlug = bookTitle
@@ -312,33 +325,58 @@ export async function POST(request: NextRequest): Promise<Response> {
           return;
         }
 
-        // Phase 2: Sequential chapter-by-chapter extraction
-        for (let i = 0; i < masterChapters.length; i++) {
-          const chapter = masterChapters[i];
-          const nextChapter = masterChapters[i + 1] ?? null;
+        // Phase 2: Parallel extraction with per-chapter retry (Task 2)
+        const extractedNums = new Set<number>();
+        let completedCount = 0;
 
+        const extractWithRetry = async (chapter: TocEntry, idx: number): Promise<void> => {
+          const nextChapter = masterChapters[idx + 1] ?? null;
           const chapterText = findChapterWindow(fullText, chapter, nextChapter);
 
           if (!chapterText) {
-            console.warn(`[/api/ingest] Chapter ${chapter.num} not found in text — skipping`);
-            send({ type: "skip", chapterNum: chapter.num, reason: "not found in extracted text" });
-            continue;
+            completedCount++;
+            send({ type: "skip", chapterNum: chapter.num, chapterTitle: chapter.title, reason: "not found in extracted text" });
+            return;
           }
 
-          try {
-            const node = await extractChapter(ai, chapter, chapterText, authorPersona, powerWords);
-            if (node) {
-              send({ type: "chapter", node, chapterNum: chapter.num });
-            } else {
-              send({ type: "skip", chapterNum: chapter.num, reason: "extraction returned empty" });
+          const MAX_ATTEMPTS = 2;
+          for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+            try {
+              const node = await extractChapter(ai, chapter, chapterText, authorPersona, powerWords);
+              if (node) {
+                extractedNums.add(chapter.num);
+                completedCount++;
+                send({ type: "chapter", node, chapterNum: chapter.num, chapterTitle: chapter.title, completedCount });
+                return;
+              }
+              // node was null (failed golden thread check) → retry
+            } catch (e) {
+              if (attempt === MAX_ATTEMPTS) {
+                completedCount++;
+                send({ type: "skip", chapterNum: chapter.num, chapterTitle: chapter.title, reason: String(e) });
+              }
             }
-          } catch (e) {
-            console.error(`[/api/ingest] Chapter ${chapter.num} failed:`, e);
-            send({ type: "skip", chapterNum: chapter.num, reason: String(e) });
           }
+        };
+
+        // Run all chapters in parallel — Promise.allSettled never throws (Task 2)
+        await Promise.allSettled(
+          masterChapters.map((chapter, idx) => extractWithRetry(chapter, idx)),
+        );
+
+        // All-or-Nothing Validator: retry any chapter that didn't make it (Task 1)
+        const missingChapters = masterChapters.filter((c) => !extractedNums.has(c.num));
+        if (missingChapters.length > 0) {
+          console.warn(`[/api/ingest] Validator: ${missingChapters.length} missing — running recovery pass`);
+          send({ type: "retry", missingCount: missingChapters.length });
+          await Promise.allSettled(
+            missingChapters.map((chapter) =>
+              extractWithRetry(chapter, masterChapters.indexOf(chapter)),
+            ),
+          );
         }
 
-        send({ type: "done", total: masterChapters.length });
+        send({ type: "done", total: masterChapters.length, extracted: extractedNums.size });
       } catch (error) {
         console.error("[/api/ingest]", error);
         send({ type: "error", message: error instanceof Error ? error.message : "Ingestion failed" });
