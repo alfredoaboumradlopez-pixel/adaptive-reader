@@ -182,24 +182,7 @@ export default function HomePage() {
     setCurrentSprintIndex(0);
   }, [libraryReadingNode?.id]);
 
-  useEffect(() => {
-    if (!isProcessingPdf) return;
-    const phases = [
-      "Mapping book structure...",
-      "Deep scan — Part 1 / 5...",
-      "Deep scan — Part 2 / 5...",
-      "Deep scan — Part 3 / 5...",
-      "Deep scan — Part 4 / 5...",
-      "Deep scan — Part 5 / 5... Almost there.",
-    ];
-    let idx = 0;
-    setToastText(phases[0]);
-    const id = window.setInterval(() => {
-      idx = Math.min(idx + 1, phases.length - 1);
-      setToastText(phases[idx]);
-    }, 11000); // 6 phases × 11s = 66s total coverage
-    return () => window.clearInterval(id);
-  }, [isProcessingPdf]);
+  // No interval-based toast cycling — the stream drives all progress updates directly
 
   const openIngestDialog = () => {
     fileInputRef.current?.click();
@@ -225,32 +208,79 @@ export default function HomePage() {
 
   const handleFileUpload = async (file: File) => {
     setIsProcessingPdf(true);
-    setToastText(`Processing "${file.name}"...`);
+    setToastText("Mapping Architecture...");
+
+    const ADMIN_NOISE =
+      /^(acknowledgment|index|bibliograph|reference|illustration credit|about the author|praise for|further reading|also by|copyright|permissions|table of contents)/i;
+
+    const rawCollected: Record<string, unknown>[] = [];
+    let totalChapters = 0;
+    let chaptersDone = 0;
 
     try {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("/api/ingest", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch("/api/ingest", { method: "POST", body: formData });
+      if (!response.body) throw new Error("No response stream from server");
 
-      if (!response.ok) {
-        const body = await response.json().catch(() => ({}));
-        throw new Error((body as { error?: string }).error ?? "Ingestion failed");
+      // Read the NDJSON stream event-by-event
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let lineBuffer = "";
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          lineBuffer += decoder.decode(value, { stream: true });
+          const lines = lineBuffer.split("\n");
+          lineBuffer = lines.pop() ?? "";
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+
+            let event: { type: string; [key: string]: unknown };
+            try {
+              event = JSON.parse(trimmed) as { type: string; [key: string]: unknown };
+            } catch {
+              continue; // skip malformed lines
+            }
+
+            switch (event.type) {
+              case "toc":
+                totalChapters = (event.totalChapters as number) ?? 0;
+                setToastText(`Extracting Chapter 1 / ${totalChapters}...`);
+                break;
+              case "chapter":
+                chaptersDone++;
+                rawCollected.push(event.node as Record<string, unknown>);
+                setToastText(
+                  chaptersDone < totalChapters
+                    ? `Extracting Chapter ${chaptersDone + 1} / ${totalChapters}...`
+                    : "Colonizing Empire...",
+                );
+                break;
+              case "skip":
+                chaptersDone++;
+                break;
+              case "error":
+                throw new Error((event.message as string) ?? "Ingestion failed");
+            }
+          }
+        }
+      } finally {
+        reader.releaseLock();
       }
 
-      const { nodes: rawNodes } = (await response.json()) as {
-        nodes: Partial<EmpireNode>[];
-      };
+      if (rawCollected.length === 0) throw new Error("No chapters were extracted from this PDF.");
 
-      const ADMIN_NOISE =
-        /^(acknowledgment|index|bibliograph|reference|illustration credit|about the author|praise for|further reading|also by|copyright|permissions|table of contents)/i;
-
-      const allNodes: EmpireNode[] = rawNodes.map((n) => {
-        const chapter = (n.chapter ?? "Unknown") as string;
-        const bookTitle = (n.bookTitle ?? "Unknown") as string;
+      // ── Map raw API nodes → typed EmpireNodes ──────────────────────────
+      const allNodes: EmpireNode[] = rawCollected.map((n) => {
+        const chapter = typeof n.chapter === "string" ? n.chapter : "Unknown";
+        const bookTitle = typeof n.bookTitle === "string" ? n.bookTitle : "Unknown";
         const num = chapterNum(chapter);
         const defaultLevel: 0 | 1 | 2 = num === 0 ? 0 : num >= 90 ? 2 : 1;
         return {
@@ -261,26 +291,24 @@ export default function HomePage() {
           supportingContext: "",
           goldenThread: "",
           ...n,
-          id: n.id ?? `node_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+          id: typeof n.id === "string" ? n.id : `node_${Date.now()}_${Math.random().toString(36).slice(2)}`,
           bookTitle,
           chapter,
           masteryStatus: "Red" as MasteryStatus,
-          level: (n.level as 0 | 1 | 2) ?? defaultLevel,
+          level: ([0, 1, 2].includes(n.level as number) ? n.level : defaultLevel) as 0 | 1 | 2,
         };
       });
 
-      // Structural Gatekeeper: discard anything that doesn't match "[N]: Title"
-      // and any admin noise that slipped through despite server-side filtering
-      const newNodes = allNodes.filter((n) => {
+      // ── Structural Gatekeeper ───────────────────────────────────────────
+      const gatekept = allNodes.filter((n) => {
         if (!/^\d+:/.test(n.chapter)) return false;
         if (ADMIN_NOISE.test(n.chapter.replace(/^\d+:\s*/, ""))) return false;
         return true;
       });
 
-      // Within-batch: keep the version of each chapter with the most sprints
-      // (handles a chapter split across two chunks — the richer half wins)
+      // ── Richer-wins dedup within this batch ────────────────────────────
       const batchById = new Map<string, EmpireNode>();
-      for (const n of newNodes) {
+      for (const n of gatekept) {
         const existing = batchById.get(n.id);
         if (!existing || n.narrativeSprints.length > existing.narrativeSprints.length) {
           batchById.set(n.id, n);
@@ -288,17 +316,13 @@ export default function HomePage() {
       }
       const dedupedBatch = Array.from(batchById.values());
 
-      let addedCount = 0;
+      // ── Merge into global state, richer version wins ────────────────────
       setGraphState((prev) => {
-        // Merge against stored state: richer version wins
         const nodeMap = new Map(prev.nodes.map((n) => [n.id, n]));
         for (const n of dedupedBatch) {
           const existing = nodeMap.get(n.id);
-          if (!existing) {
+          if (!existing || n.narrativeSprints.length > existing.narrativeSprints.length) {
             nodeMap.set(n.id, n);
-            addedCount++;
-          } else if (n.narrativeSprints.length > existing.narrativeSprints.length) {
-            nodeMap.set(n.id, n); // replace with richer version from split chapter
           }
         }
         const merged = Array.from(nodeMap.values()).sort((a, b) => {
@@ -312,15 +336,13 @@ export default function HomePage() {
         return updated;
       });
 
-      setToastText(`"${file.name}" ingested — ${addedCount} nodes added.`);
+      setToastText(`"${file.name}" — ${dedupedBatch.length} chapters colonized.`);
       setCurrentView("map");
     } catch (error) {
-      setToastText(
-        error instanceof Error ? error.message : "Ingestion failed.",
-      );
+      setToastText(error instanceof Error ? error.message : "Ingestion failed.");
     } finally {
       setIsProcessingPdf(false);
-      window.setTimeout(() => setToastText(null), 2500);
+      window.setTimeout(() => setToastText(null), 3500);
     }
   };
 
@@ -594,7 +616,7 @@ export default function HomePage() {
                   {isProcessingPdf ? (
                     <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-violet-300/30 bg-violet-500/15 px-4 py-2 text-sm text-violet-100">
                       <span className="h-2 w-2 animate-pulse rounded-full bg-violet-300" />
-                      Processing...
+                      {toastText ?? "Mapping Architecture..."}
                     </div>
                   ) : null}
                 </div>
