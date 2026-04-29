@@ -51,6 +51,24 @@ Analyze the text and return a raw JSON object (no markdown, no explanation) with
   "powerWords": ["word1", "word2", "word3", "word4", "word5"]
 }
 
+━━━━━━━━━━━━━━━━━━━━━━
+LEAF-NODE PROTOCOL (SOP v11) — READ THIS BEFORE EVERYTHING ELSE
+━━━━━━━━━━━━━━━━━━━━━━
+Many books use this hierarchy: PARTS that contain CHAPTERS.
+Example:
+  PART ONE: The Foundation
+    Chapter 1: Getting Started
+    Chapter 2: Core Concepts
+  PART TWO: The System
+    Chapter 3: Capture
+    Chapter 4: Organize
+
+YOUR ABSOLUTE RULE: PARTS are containers. They are NEVER nodes.
+masterChapters must contain ONLY the leaf nodes — the actual chapters with content.
+Correct output for the example above: [Ch1, Ch2, Ch3, Ch4]. Parts do NOT appear.
+Flatten aggressively. Missing a chapter is always worse than including one extra.
+━━━━━━━━━━━━━━━━━━━━━━
+
 masterChapters rules:
 - Include ONLY top-level, numbered chapters. Never include sub-sections or sub-headers.
 - Preface / Introduction / Prologue / Foreword → {"num": 0, "title": "Introduction"}
@@ -105,6 +123,8 @@ async function runDiscovery(
 // CHAPTER TEXT LOCATION (hunt by title + number patterns)
 // ─────────────────────────────────────────────────────────────
 
+const PART_HEADER_RE = /^\s*(part|parte|section|sección|unit|módulo|module|book|tema|theme)\s+(one|two|three|four|five|six|seven|eight|nine|ten|\d+)\b/i;
+
 function findChapterStart(fullText: string, chapter: TocEntry): number {
   const lower = fullText.toLowerCase();
   const titleLower = chapter.title.toLowerCase();
@@ -156,8 +176,16 @@ function findChapterWindow(
   if (nextChapter) {
     const nextStart = findChapterStart(fullText, nextChapter);
     if (nextStart !== -1 && nextStart > startIdx + 200) {
-      // Include a 10k overlap into the next chapter to capture trailing content
-      endIdx = Math.min(endIdx, nextStart + WINDOW_OVERLAP);
+      // SOP v11: check if nextStart lands on a PART header instead of a real chapter
+      const surroundingText = fullText.slice(Math.max(0, nextStart - 50), nextStart + 200);
+      const linesAround = surroundingText.split("\n");
+      const isPartBoundary = linesAround.some((line) => PART_HEADER_RE.test(line));
+      if (isPartBoundary) {
+        // Don't stop at a PART header — extend window to capture the real chapter
+        endIdx = Math.min(startIdx + 60_000, fullText.length);
+      } else {
+        endIdx = Math.min(endIdx, nextStart + WINDOW_OVERLAP);
+      }
     }
   }
 
@@ -216,6 +244,7 @@ You are extracting EXACTLY ONE chapter. Your entire response is ONE JSON object 
 Sub-headers, sub-sections, call-out boxes, bold headings, and any internal structure of this chapter
 are FUEL for the Sprints. They are NOT nodes. They are NOT objects. They do not exist as output.
 ONE chapter → ONE JSON object. If you write an array or more than one object, you have failed.
+PART HEADERS: If the chapter text contains a heading like "PART ONE", "PART TWO", "PARTE UNO" etc., ignore it completely. It is a container label, not a chapter. Extract the content that follows it.
 
 ━━━━━━━━━━━━━━━━━━━━━━
 SPRINTS — "narrativeSprints" — EXACTLY 3 TO 4 STRINGS
@@ -313,7 +342,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
         // Phase 1: Blueprint — TOC + author persona + power words
-        const { masterChapters, authorPersona, powerWords } = await runDiscovery(ai, fullText.slice(0, 50_000));
+        const { masterChapters, authorPersona, powerWords } = await runDiscovery(ai, fullText.slice(0, 100_000));
         console.log(
           `[/api/ingest] Blueprint: ${masterChapters.length} chapters | persona: "${authorPersona}" | words: [${powerWords.join(", ")}]`,
         );
