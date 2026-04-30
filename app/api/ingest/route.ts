@@ -97,23 +97,39 @@ powerWords: Exactly 5 of the author's recurring metaphors, coined terms, or sign
 
 Return ONLY the raw JSON object.`;
 
-const TOC_SNIPER_PROMPT = `You are reading the opening pages of a book. Your ONLY job is to find the Table of Contents.
+const TOC_SNIPER_PROMPT = `You are analyzing the opening section of a book PDF. Your ONLY job is to find and extract the Table of Contents.
 
-Look for a page labeled "Contents", "Table of Contents", "Index", or similar. It will list chapter titles and page numbers.
+The Table of Contents is a page (usually titled "Contents", "Table of Contents", or just a list of chapter titles with page numbers) that appears in the first pages of the book.
 
-Extract ONLY what is listed in that Table of Contents. Do NOT infer chapters from body text.
+STEP 1: Locate the Table of Contents page in the text.
+STEP 2: Extract ALL entries that are actual chapters (leaf nodes with real content).
 
-Rules:
-- Extract leaf chapters only (actual chapters with content, NOT "Part One", "Part Two" containers)
+CRITICAL RULES:
+- Extract ONLY leaf chapters — the actual numbered reading units
+- "Part One", "Part Two", "Part Three" etc. are CONTAINERS, not chapters. NEVER include them.
+- Every chapter INSIDE a Part must be included individually
 - Preface/Introduction/Prologue → {"num": 0, "title": "Introduction"}
 - Conclusion/Epilogue → {"num": 99, "title": "Conclusion"}
-- Exclude: Index, Bibliography, Acknowledgments, About the Author, Copyright
+- Exclude: Index, Bibliography, Acknowledgments, About the Author, Notes, Copyright
 
-Return raw JSON only:
-{"masterChapters": [{"num": 1, "title": "Chapter Title"}, ...], "authorPersona": "", "powerWords": []}
+EXAMPLE — if the TOC shows:
+  Part One: Remember
+    1. Where It All Started .............. 23
+    2. What Is a Second Brain? ........... 41
+  Part Two: Connect
+    3. How a Captain Keeps His Ship ...... 67
+    4. Capture ........................... 89
+
+CORRECT output:
+{"masterChapters": [{"num":0,"title":"Introduction"},{"num":1,"title":"Where It All Started"},{"num":2,"title":"What Is a Second Brain?"},{"num":3,"title":"How a Captain Keeps His Ship"},{"num":4,"title":"Capture"}], "authorPersona": "", "powerWords": []}
+
+WRONG output (never do this):
+{"masterChapters": [{"num":1,"title":"Part One: Remember"},{"num":2,"title":"Part Two: Connect"}]}
 
 If you cannot find a Table of Contents in this text, return:
-{"masterChapters": [], "authorPersona": "", "powerWords": []}`;
+{"masterChapters": [], "authorPersona": "", "powerWords": []}
+
+Return ONLY raw JSON. No markdown. No explanation.`;
 
 async function runDiscovery(
   ai: GoogleGenAI,
@@ -138,7 +154,7 @@ async function runDiscovery(
 
   // ── Phase A: TOC Sniper — first 15k chars ────────────────────────────────
   try {
-    const tocChunk = fullText.slice(0, 15_000);
+    const tocChunk = fullText.slice(0, 40_000);
     const tocResult = await ai.models.generateContent({
       model: "gemini-2.5-pro",
       contents: `${TOC_SNIPER_PROMPT}\n\nTEXT:\n${tocChunk}`,
@@ -147,7 +163,7 @@ async function runDiscovery(
     const tocChapters = parseAndFilter((tocResult.text ?? "").trim());
     console.log(`[Discovery] Phase A TOC Sniper: ${tocChapters.length} chapters`);
 
-    if (tocChapters.length >= 5) {
+    if (tocChapters.length >= 3) {
       const bodyChunk = fullText.slice(0, 100_000);
       const personaResult = await ai.models.generateContent({
         model: "gemini-2.5-pro",
