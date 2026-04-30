@@ -135,6 +135,14 @@ async function runDiscovery(
   ai: GoogleGenAI,
   fullText: string,
 ): Promise<{ masterChapters: TocEntry[]; authorPersona: string; powerWords: string[] }> {
+  // DEBUG: show where TOC lives
+  const tocMarkers = ["contents", "chapter 1", "chapter one", "part one", "where it all started"];
+  for (const marker of tocMarkers) {
+    const pos = fullText.toLowerCase().indexOf(marker);
+    if (pos !== -1) console.log(`[TOC-DEBUG] "${marker}" found at char ${pos}`);
+  }
+  console.log(`[TOC-DEBUG] Total text length: ${fullText.length} chars`);
+
   const PART_FILTER = (e: TocEntry) => {
     const lower = e.title.toLowerCase().trim();
     return !/^(part|parte|section|sección|unit|módulo|module|book|tema)\s+(one|two|three|four|five|six|seven|eight|nine|ten|\d+)/i.test(lower);
