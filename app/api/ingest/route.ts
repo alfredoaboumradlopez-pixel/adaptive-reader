@@ -82,6 +82,7 @@ RULE 5: Missing a chapter is always worse than including one extra. Be generous.
 ━━━━━━━━━━━━━━━━━━━━━━
 
 masterChapters rules:
+CRITICAL: If the book uses PARTS that contain CHAPTERS, list ONLY the chapters — never the parts. Flatten completely: Part1→Ch1,Ch2 / Part2→Ch3,Ch4 becomes [Ch1,Ch2,Ch3,Ch4]. Parts are containers, never nodes.
 - Include ONLY the smallest content units — chapters/lessons inside Parts, never the Parts themselves.
 - Preface / Introduction / Prologue / Foreword → {"num": 0, "title": "Introduction"}
 - Conclusion / Epilogue / Afterword            → {"num": 99, "title": "Conclusion"}
