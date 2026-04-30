@@ -82,8 +82,10 @@ RULE 5: Missing a chapter is always worse than including one extra. Be generous.
 ━━━━━━━━━━━━━━━━━━━━━━
 
 masterChapters rules:
-CRITICAL: If the book uses PARTS that contain CHAPTERS, list ONLY the chapters — never the parts. Flatten completely: Part1→Ch1,Ch2 / Part2→Ch3,Ch4 becomes [Ch1,Ch2,Ch3,Ch4]. Parts are containers, never nodes.
-- Include ONLY the smallest content units — chapters/lessons inside Parts, never the Parts themselves.
+- CRITICAL — LEAF-NODE PROTOCOL: If the book uses PARTS containing CHAPTERS, list ONLY the chapters inside each Part — NEVER the Parts themselves. Flatten completely: Part1→Ch1,Ch2 / Part2→Ch3,Ch4 → masterChapters=[Ch1,Ch2,Ch3,Ch4]. Parts are containers with zero content. Missing a chapter is worse than one extra.
+- WRONG: [{'num':1,'title':'PART ONE: Foundation'},{'num':2,'title':'PART TWO: Method'}]
+- RIGHT:  [{'num':1,'title':'Where It All Started'},{'num':2,'title':'What Is a Second Brain?'},{'num':3,'title':'Capture'},{'num':4,'title':'Organize'}]
+- Include ONLY the smallest content units with real content. Never include Parts, Sections, Units, or Modules.
 - Preface / Introduction / Prologue / Foreword → {"num": 0, "title": "Introduction"}
 - Conclusion / Epilogue / Afterword            → {"num": 99, "title": "Conclusion"}
 - EXCLUDE entirely: Index, Bibliography, Acknowledgments, Credits, About the Author,
