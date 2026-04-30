@@ -31,15 +31,13 @@ type TocEntry = { num: number; title: string };
 
 export type StreamEvent =
   | { type: "toc"; masterChapters: TocEntry[]; authorPersona: string; powerWords: string[]; totalChapters: number }
-  | { type: "chapter"; node: Record<string, unknown>; chapterNum: number; chapterTitle: string; completedCount: number }
-  | { type: "skip"; chapterNum: number; chapterTitle: string; reason: string }
-  | { type: "retry"; missingCount: number }
-  | { type: "done"; total: number; extracted: number }
+  | { type: "chapter"; node: Record<string, unknown>; chapterNum: number }
+  | { type: "skip"; chapterNum: number; reason: string }
+  | { type: "done"; total: number }
   | { type: "error"; message: string };
 
 // ─────────────────────────────────────────────────────────────
 // PHASE 1 — DISCOVERY PASS (Blueprint)
-// SOP v11: prompt agresivo que aplana PARTE → CAPÍTULO
 // ─────────────────────────────────────────────────────────────
 
 const DISCOVERY_PROMPT = `You are a book architect. Your ONLY job is to build the Blueprint for this book.
@@ -52,40 +50,8 @@ Analyze the text and return a raw JSON object (no markdown, no explanation) with
   "powerWords": ["word1", "word2", "word3", "word4", "word5"]
 }
 
-━━━━━━━━━━━━━━━━━━━━━━
-LEAF-NODE PROTOCOL (SOP v11) — THIS OVERRIDES EVERYTHING ELSE
-━━━━━━━━━━━━━━━━━━━━━━
-Many books use this hierarchy: PARTS that contain CHAPTERS.
-
-Example structure:
-  PART ONE: The Foundation
-    Chapter 1: Where It All Started
-    Chapter 2: What Is a Second Brain?
-  PART TWO: The Method
-    Chapter 3: Capture
-    Chapter 4: Organize
-
-RULE 1: PARTS are containers. They have zero content of their own.
-NEVER include Part, Section, Unit, Module, Theme, or Book in masterChapters. Ever.
-
-RULE 2: Extract ONLY the leaf nodes — the actual numbered chapters with real content.
-Correct output for the example: [Ch1, Ch2, Ch3, Ch4]. Parts never appear.
-
-RULE 3: Number chapters sequentially (1, 2, 3...) across all Parts.
-Do NOT reset numbering per Part.
-
-RULE 4: Flatten completely and aggressively.
-WRONG: [{"num":1,"title":"PART ONE: The Foundation"}, {"num":2,"title":"PART TWO: The Method"}]
-RIGHT:  [{"num":1,"title":"Where It All Started"}, {"num":2,"title":"What Is a Second Brain?"}, {"num":3,"title":"Capture"}, {"num":4,"title":"Organize"}]
-
-RULE 5: Missing a chapter is always worse than including one extra. Be generous.
-━━━━━━━━━━━━━━━━━━━━━━
-
 masterChapters rules:
-- CRITICAL — LEAF-NODE PROTOCOL: If the book uses PARTS containing CHAPTERS, list ONLY the chapters inside each Part — NEVER the Parts themselves. Flatten completely: Part1→Ch1,Ch2 / Part2→Ch3,Ch4 → masterChapters=[Ch1,Ch2,Ch3,Ch4]. Parts are containers with zero content. Missing a chapter is worse than one extra.
-- WRONG: [{'num':1,'title':'PART ONE: Foundation'},{'num':2,'title':'PART TWO: Method'}]
-- RIGHT:  [{'num':1,'title':'Where It All Started'},{'num':2,'title':'What Is a Second Brain?'},{'num':3,'title':'Capture'},{'num':4,'title':'Organize'}]
-- Include ONLY the smallest content units with real content. Never include Parts, Sections, Units, or Modules.
+- Include ONLY top-level, numbered chapters. Never include sub-sections or sub-headers.
 - Preface / Introduction / Prologue / Foreword → {"num": 0, "title": "Introduction"}
 - Conclusion / Epilogue / Afterword            → {"num": 99, "title": "Conclusion"}
 - EXCLUDE entirely: Index, Bibliography, Acknowledgments, Credits, About the Author,
@@ -93,7 +59,14 @@ masterChapters rules:
 - Be generous — missing a chapter is worse than including one extra.
 
 authorPersona: One sentence describing sentence structure and rhetorical style.
+  Examples:
+  - "Peter Thiel argues in contrarian, paradoxical aphorisms with a philosophical edge."
+  - "Tiago Forte writes in tactical, systems-oriented prose with an empowering, instructional tone."
+  - "Malcolm Gladwell uses curious, anecdote-driven storytelling with a clinical narrative voice."
+
 powerWords: Exactly 5 of the author's recurring metaphors, coined terms, or signature vocabulary.
+  Examples for Thiel: ["zero to one", "secrets", "definite optimism", "creative monopoly", "last mover"]
+  Examples for Forte: ["PARA", "progressive summarization", "CODE", "intermediate packets", "second brain"]
 
 Return ONLY the raw JSON object.`;
 
@@ -117,8 +90,6 @@ async function runDiscovery(
     const masterChapters = (parsed.masterChapters ?? []).filter(
       (e) => typeof e.num === "number" && typeof e.title === "string",
     );
-    console.log(`[Discovery] Gemini raw:`, JSON.stringify(parsed.masterChapters));
-    console.log(`[Discovery] Filtered (${masterChapters.length}):`, masterChapters.map(c => `${c.num}:${c.title}`).join(" | "));
     return {
       masterChapters,
       authorPersona: parsed.authorPersona ?? "",
@@ -130,24 +101,25 @@ async function runDiscovery(
 }
 
 // ─────────────────────────────────────────────────────────────
-// SOP v11: PART_HEADER_RE — detecta encabezados de contenedor
-// Estos NO son límites de capítulo — son texto dentro del capítulo actual
+// CHAPTER TEXT LOCATION (hunt by title + number patterns)
 // ─────────────────────────────────────────────────────────────
-
-const PART_HEADER_RE =
-  /^\s*(part|parte|section|sección|unit|módulo|module|book|tema|theme)\s+(one|two|three|four|five|six|seven|eight|nine|ten|\d+)\b/i;
 
 function findChapterStart(fullText: string, chapter: TocEntry): number {
   const lower = fullText.toLowerCase();
   const titleLower = chapter.title.toLowerCase();
+
+  // Skip the first 8k to avoid TOC matches (TOC is always near the front)
   const skipToc = Math.min(8_000, Math.floor(fullText.length * 0.05));
 
+  // Strategy 1: Exact title match after TOC area
   let idx = lower.indexOf(titleLower, skipToc);
   if (idx !== -1) return idx;
 
+  // Strategy 2: Exact title match from start (short books)
   idx = lower.indexOf(titleLower);
   if (idx !== -1) return idx;
 
+  // Strategy 3: Chapter-number patterns
   for (const pat of [
     `chapter ${chapter.num}\n`,
     `chapter ${chapter.num} `,
@@ -174,20 +146,17 @@ function findChapterWindow(
   const startIdx = findChapterStart(fullText, chapter);
   if (startIdx === -1) return "";
 
+  // Start with a 1k lookback overlap so chapter headings aren't cut off
   const windowStart = Math.max(0, startIdx - 1_000);
+
+  // Default window: 50k chars past the chapter start
   let endIdx = startIdx + 50_000;
 
   if (nextChapter) {
     const nextStart = findChapterStart(fullText, nextChapter);
     if (nextStart !== -1 && nextStart > startIdx + 200) {
-      // SOP v11: si nextStart apunta a un PART header, no lo usamos como límite
-      const surroundingText = fullText.slice(Math.max(0, nextStart - 50), nextStart + 200);
-      const isPartBoundary = surroundingText.split("\n").some((line) => PART_HEADER_RE.test(line));
-      if (isPartBoundary) {
-        endIdx = Math.min(startIdx + 60_000, fullText.length);
-      } else {
-        endIdx = Math.min(endIdx, nextStart + WINDOW_OVERLAP);
-      }
+      // Include a 10k overlap into the next chapter to capture trailing content
+      endIdx = Math.min(endIdx, nextStart + WINDOW_OVERLAP);
     }
   }
 
@@ -199,9 +168,7 @@ function findChapterWindow(
 // ─────────────────────────────────────────────────────────────
 
 function buildChapterPrompt(chapter: TocEntry, authorPersona: string, powerWords: string[]): string {
-  const pwLine = powerWords.length > 0
-    ? `Power Words (use these in your sprints): ${powerWords.map((w) => `"${w}"`).join(", ")}`
-    : "";
+  const pwLine = powerWords.length > 0 ? `Power Words (use these in your sprints): ${powerWords.map((w) => `"${w}"`).join(", ")}` : "";
   return `You are extracting exactly ONE chapter from a book.
 
 Target chapter: ${chapter.num}: ${chapter.title}
@@ -222,44 +189,61 @@ Return a SINGLE raw JSON object (not an array) — no markdown, no preamble:
 }
 
 ━━━━━━━━━━━━━━━━━━━━━━
-PRIMER — supportingContext — EXACTLY 2 SENTENCES
+PRIMER — "supportingContext" — EXACTLY 2 SENTENCES
 ━━━━━━━━━━━━━━━━━━━━━━
 Set the scene BEFORE the story begins. Static world, no outcomes, no spoilers.
 Sentence 1: A concrete fact, person, place, or moment from the chapter.
 Sentence 2: A detail that opens a gap — the reader must cross it to find the answer.
-FORBIDDEN: 'Chapter', 'Section', 'unlike', 'whereas', 'but', 'yet', 'however',
-'while', 'though', 'although', 'despite', 'explains', 'reveals', 'shows', 'proves'.
+
+FORBIDDEN in supportingContext: any word implying outcome or contrast.
+Banned: 'Chapter', 'Section', 'Summarize', 'unlike', 'whereas', 'but', 'yet',
+'however', 'while', 'though', 'although', 'despite', 'difference', 'contrast',
+'divide', 'poor', 'rich', 'wealthy', 'success', 'failure', 'dangerous', 'safe',
+'better', 'worse', 'explains', 'reveals', 'shows', 'proves', 'conclusion'.
+
+GOOD EXAMPLE:
+"In 2004, Blockbuster operated 9,000 stores and carried a $6 billion valuation.
+Reed Hastings had requested a meeting with their CEO three years earlier."
+
+BAD EXAMPLE:
+"Blockbuster ignored streaming and went bankrupt while Netflix thrived."
 
 ━━━━━━━━━━━━━━━━━━━━━━
-ONE-NODE RULE
-━━━━━━━━━━━━━━━━━━━━━━
-You are extracting EXACTLY ONE chapter. ONE JSON object — never an array.
-Sub-headers and internal structure are FUEL for Sprints, not separate nodes.
-PART HEADERS: If the text contains "PART ONE", "PART TWO", "PARTE UNO" etc.,
-ignore them completely. They are container labels, not chapters.
-ONE chapter → ONE JSON object. Array = failure.
-
-━━━━━━━━━━━━━━━━━━━━━━
-SPRINTS — narrativeSprints — EXACTLY 3 TO 4 STRINGS
+SPRINTS — "narrativeSprints" — EXACTLY 3 TO 4 STRINGS
 ━━━━━━━━━━━━━━━━━━━━━━
 Each string: 4 to 5 sentences of flowing prose. NO bullet points. NO numbered lists.
-Sprint 1: One concrete, tactile scene from this chapter.
-Sprint 2: The core mechanism in the author's EXACT vocabulary.
-Sprint 3: Specific evidence — names, numbers, anecdotes.
+Sub-sections within this chapter are the fuel for different Sprints — they do NOT become separate nodes.
+If this chapter has sub-sections A, B, C → Sprint 1 covers A, Sprint 2 covers B, Sprint 3 covers C.
+
+Sprint 1: Open with one concrete, tactile scene — a place, a person, a number from this chapter.
+Sprint 2: Name the core mechanism using the author's EXACT vocabulary — prioritize the Power Words listed above.
+Sprint 3: Develop with specific evidence — names, numbers, anecdotes from the chapter text.
 Sprint 4 (optional): Build to the edge of the truth without stating it.
-Forbidden: 'it is important to note', 'this suggests that', 'in summary'.
+
+Voice: ${authorPersona || "Use the author's specific vocabulary. No hedging. No filler phrases."}
+${pwLine ? `Vocabulary mandate: The Power Words must appear naturally in the sprints.` : ""}
+Forbidden: 'it is important to note', 'this suggests that', 'one could argue', 'in summary'.
 
 ━━━━━━━━━━━━━━━━━━━━━━
-GOLDEN THREAD — goldenThread — EXACTLY 1 SENTENCE
+GOLDEN THREAD — "goldenThread" — EXACTLY 1 SENTENCE
 ━━━━━━━━━━━━━━━━━━━━━━
-The singular aha moment of the ENTIRE chapter.
+The singular 'Aha!' moment of the ENTIRE chapter — not just the opening paragraph.
 Must resolve the curiosity gap opened by supportingContext.
+The ONLY place where outcomes, causes, or judgments are permitted.
 
+━━━━━━━━━━━━━━━━━━━━━━
+OTHER FIELDS
+━━━━━━━━━━━━━━━━━━━━━━
 "id": [book-slug]-${chapter.num}
   book-slug = bookTitle lowercased, spaces→hyphens, non-alphanumeric removed
-"level": 0=Introduction, 1=core chapter, 2=deep-dive/appendix
+  EXAMPLE: "Building a Second Brain" → id "building-a-second-brain-${chapter.num}"
 
-Return ONLY the raw JSON object.`;
+"level":
+  0 if this is an Introduction, Preface, or Prologue
+  1 for core narrative/conceptual chapters
+  2 for deep-dive, technical, or appendix chapters
+
+Return ONLY the raw JSON object. No markdown. No array brackets. No preamble.`;
 }
 
 async function extractChapter(
@@ -279,9 +263,8 @@ async function extractChapter(
   raw = raw.replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
 
   const parsed = JSON.parse(raw) as Record<string, unknown>;
-  const goldenThread = typeof parsed.goldenThread === "string" ? parsed.goldenThread.trim() : "";
-  if (!goldenThread) return null;
 
+  // Server-side ID override: always canonical [book-slug]-[chapter-number]
   const bookTitle = typeof parsed.bookTitle === "string" ? parsed.bookTitle : "unknown";
   const bookSlug = bookTitle
     .toLowerCase()
@@ -316,72 +299,46 @@ export async function POST(request: NextRequest): Promise<Response> {
         const fullText = await extractText(buffer);
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-        // Phase 1: Discovery — SOP v11 flattened TOC
-        const { masterChapters, authorPersona, powerWords } =
-          await runDiscovery(ai, fullText.slice(0, 100_000));
+        // Phase 1: Blueprint — TOC + author persona + power words
+        const { masterChapters, authorPersona, powerWords } = await runDiscovery(ai, fullText.slice(0, 50_000));
+        console.log(
+          `[/api/ingest] Blueprint: ${masterChapters.length} chapters | persona: "${authorPersona}" | words: [${powerWords.join(", ")}]`,
+        );
 
-        send({
-          type: "toc",
-          masterChapters,
-          authorPersona,
-          powerWords,
-          totalChapters: masterChapters.length,
-        });
+        send({ type: "toc", masterChapters, authorPersona, powerWords, totalChapters: masterChapters.length });
 
         if (masterChapters.length === 0) {
           send({ type: "error", message: "Could not identify any chapters in this PDF." });
           return;
         }
 
-        // Phase 2: Parallel extraction with retry
-        const extractedNums = new Set<number>();
-        let completedCount = 0;
+        // Phase 2: Sequential chapter-by-chapter extraction
+        for (let i = 0; i < masterChapters.length; i++) {
+          const chapter = masterChapters[i];
+          const nextChapter = masterChapters[i + 1] ?? null;
 
-        const extractWithRetry = async (chapter: TocEntry, idx: number): Promise<void> => {
-          const nextChapter = masterChapters[idx + 1] ?? null;
           const chapterText = findChapterWindow(fullText, chapter, nextChapter);
 
           if (!chapterText) {
-            completedCount++;
-            send({ type: "skip", chapterNum: chapter.num, chapterTitle: chapter.title, reason: "not found in extracted text" });
-            return;
+            console.warn(`[/api/ingest] Chapter ${chapter.num} not found in text — skipping`);
+            send({ type: "skip", chapterNum: chapter.num, reason: "not found in extracted text" });
+            continue;
           }
 
-          const MAX_ATTEMPTS = 2;
-          for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-            try {
-              const node = await extractChapter(ai, chapter, chapterText, authorPersona, powerWords);
-              if (node) {
-                extractedNums.add(chapter.num);
-                completedCount++;
-                send({ type: "chapter", node, chapterNum: chapter.num, chapterTitle: chapter.title, completedCount });
-                return;
-              }
-            } catch (e) {
-              if (attempt === MAX_ATTEMPTS) {
-                completedCount++;
-                send({ type: "skip", chapterNum: chapter.num, chapterTitle: chapter.title, reason: String(e) });
-              }
+          try {
+            const node = await extractChapter(ai, chapter, chapterText, authorPersona, powerWords);
+            if (node) {
+              send({ type: "chapter", node, chapterNum: chapter.num });
+            } else {
+              send({ type: "skip", chapterNum: chapter.num, reason: "extraction returned empty" });
             }
+          } catch (e) {
+            console.error(`[/api/ingest] Chapter ${chapter.num} failed:`, e);
+            send({ type: "skip", chapterNum: chapter.num, reason: String(e) });
           }
-        };
-
-        await Promise.allSettled(
-          masterChapters.map((chapter, idx) => extractWithRetry(chapter, idx)),
-        );
-
-        // Recovery pass for any missing chapters
-        const missingChapters = masterChapters.filter((c) => !extractedNums.has(c.num));
-        if (missingChapters.length > 0) {
-          send({ type: "retry", missingCount: missingChapters.length });
-          await Promise.allSettled(
-            missingChapters.map((chapter) =>
-              extractWithRetry(chapter, masterChapters.indexOf(chapter)),
-            ),
-          );
         }
 
-        send({ type: "done", total: masterChapters.length, extracted: extractedNums.size });
+        send({ type: "done", total: masterChapters.length });
       } catch (error) {
         console.error("[/api/ingest]", error);
         send({ type: "error", message: error instanceof Error ? error.message : "Ingestion failed" });
