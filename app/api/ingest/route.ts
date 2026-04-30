@@ -97,35 +97,101 @@ powerWords: Exactly 5 of the author's recurring metaphors, coined terms, or sign
 
 Return ONLY the raw JSON object.`;
 
+const TOC_SNIPER_PROMPT = `You are reading the opening pages of a book. Your ONLY job is to find the Table of Contents.
+
+Look for a page labeled "Contents", "Table of Contents", "Index", or similar. It will list chapter titles and page numbers.
+
+Extract ONLY what is listed in that Table of Contents. Do NOT infer chapters from body text.
+
+Rules:
+- Extract leaf chapters only (actual chapters with content, NOT "Part One", "Part Two" containers)
+- Preface/Introduction/Prologue → {"num": 0, "title": "Introduction"}
+- Conclusion/Epilogue → {"num": 99, "title": "Conclusion"}
+- Exclude: Index, Bibliography, Acknowledgments, About the Author, Copyright
+
+Return raw JSON only:
+{"masterChapters": [{"num": 1, "title": "Chapter Title"}, ...], "authorPersona": "", "powerWords": []}
+
+If you cannot find a Table of Contents in this text, return:
+{"masterChapters": [], "authorPersona": "", "powerWords": []}`;
+
 async function runDiscovery(
   ai: GoogleGenAI,
-  firstChunk: string,
+  fullText: string,
 ): Promise<{ masterChapters: TocEntry[]; authorPersona: string; powerWords: string[] }> {
+  const PART_FILTER = (e: TocEntry) => {
+    const lower = e.title.toLowerCase().trim();
+    return !/^(part|parte|section|sección|unit|módulo|module|book|tema)\s+(one|two|three|four|five|six|seven|eight|nine|ten|\d+)/i.test(lower);
+  };
+
+  const parseAndFilter = (raw: string): TocEntry[] => {
+    try {
+      const cleaned = raw.replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
+      const parsed = JSON.parse(cleaned) as { masterChapters?: TocEntry[] };
+      return (parsed.masterChapters ?? [])
+        .filter((e) => typeof e.num === "number" && typeof e.title === "string")
+        .filter(PART_FILTER);
+    } catch {
+      return [];
+    }
+  };
+
+  // ── Phase A: TOC Sniper — first 15k chars ────────────────────────────────
+  try {
+    const tocChunk = fullText.slice(0, 15_000);
+    const tocResult = await ai.models.generateContent({
+      model: "gemini-2.5-pro",
+      contents: `${TOC_SNIPER_PROMPT}\n\nTEXT:\n${tocChunk}`,
+      config: { temperature: 0.0 },
+    });
+    const tocChapters = parseAndFilter((tocResult.text ?? "").trim());
+    console.log(`[Discovery] Phase A TOC Sniper: ${tocChapters.length} chapters`);
+
+    if (tocChapters.length >= 5) {
+      const bodyChunk = fullText.slice(0, 100_000);
+      const personaResult = await ai.models.generateContent({
+        model: "gemini-2.5-pro",
+        contents: `From this book text, return ONLY a raw JSON with two fields:
+{"authorPersona": "One sentence describing the author's rhetorical style", "powerWords": ["word1","word2","word3","word4","word5"]}
+No markdown. No preamble.\n\nTEXT:\n${bodyChunk}`,
+        config: { temperature: 0.1 },
+      });
+      let personaRaw = (personaResult.text ?? "").trim();
+      personaRaw = personaRaw.replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
+      let authorPersona = "";
+      let powerWords: string[] = [];
+      try {
+        const p = JSON.parse(personaRaw) as { authorPersona?: string; powerWords?: string[] };
+        authorPersona = p.authorPersona ?? "";
+        powerWords = Array.isArray(p.powerWords) ? p.powerWords : [];
+      } catch { /* use defaults */ }
+
+      console.log(`[Discovery] Phase A success: ${tocChapters.length} chapters | persona: "${authorPersona}"`);
+      return { masterChapters: tocChapters, authorPersona, powerWords };
+    }
+  } catch (e) {
+    console.warn("[Discovery] Phase A failed:", e);
+  }
+
+  // ── Phase B: Full scan — first 100k chars (fallback) ─────────────────────
+  console.log("[Discovery] Phase A insufficient, running Phase B full scan...");
   try {
     const result = await ai.models.generateContent({
       model: "gemini-2.5-pro",
-      contents: `${DISCOVERY_PROMPT}\n\nTEXT:\n${firstChunk}`,
+      contents: `${DISCOVERY_PROMPT}\n\nTEXT:\n${fullText.slice(0, 100_000)}`,
       config: { temperature: 0.1 },
     });
     let raw = (result.text ?? "").trim();
     raw = raw.replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
-    const parsed = JSON.parse(raw) as {
-      masterChapters: TocEntry[];
-      authorPersona: string;
-      powerWords: string[];
-    };
-    const masterChapters = (parsed.masterChapters ?? []).filter(
-      (e) => typeof e.num === "number" && typeof e.title === "string",
-    ).filter((e) => {
-      const lower = e.title.toLowerCase().trim();
-      return !/^(part|parte|section|sección|unit|módulo|module|book|tema)\s+(one|two|three|four|five|six|seven|eight|nine|ten|\d+)/i.test(lower);
-    });
-    console.log(`[Discovery] Gemini raw:`, JSON.stringify(parsed.masterChapters));
-    console.log(`[Discovery] Filtered (${masterChapters.length}):`, masterChapters.map(c => `${c.num}:${c.title}`).join(" | "));
+    const parsed = JSON.parse(raw) as { masterChapters?: TocEntry[]; authorPersona?: string; powerWords?: string[] };
+    const masterChapters = (parsed.masterChapters ?? [])
+      .filter((e) => typeof e.num === "number" && typeof e.title === "string")
+      .filter(PART_FILTER);
+    console.log(`[Discovery] Phase B: ${masterChapters.length} chapters`);
     return {
       masterChapters,
       authorPersona: parsed.authorPersona ?? "",
-      powerWords: Array.isArray(parsed.powerWords) ? (parsed.powerWords as string[]) : [],
+      powerWords: Array.isArray(parsed.powerWords) ? parsed.powerWords : [],
     };
   } catch {
     return { masterChapters: [], authorPersona: "", powerWords: [] };
@@ -321,7 +387,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
         // Phase 1: Discovery — SOP v11 flattened TOC
         const { masterChapters, authorPersona, powerWords } =
-          await runDiscovery(ai, fullText.slice(0, 100_000));
+          await runDiscovery(ai, fullText);
 
         send({
           type: "toc",
