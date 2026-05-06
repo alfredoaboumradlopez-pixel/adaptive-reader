@@ -197,29 +197,37 @@ No markdown. No preamble.\n\nTEXT:\n${bodyChunk}`,
     console.warn("[Discovery] Phase A failed:", e);
   }
 
-  // ── Phase B: Full scan — first 100k chars (fallback) ─────────────────────
+  // ── Phase B: Full scan — first 100k chars (fallback, up to 3 attempts) ──────
   console.log("[Discovery] Phase A insufficient, running Phase B full scan...");
-  try {
-    const result = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
-      contents: `${DISCOVERY_PROMPT}\n\nTEXT:\n${fullText.slice(0, 100_000)}`,
-      config: { temperature: 0.1 },
-    });
-    let raw = (result.text ?? "").trim();
-    raw = raw.replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
-    const parsed = JSON.parse(raw) as { masterChapters?: TocEntry[]; authorPersona?: string; powerWords?: string[] };
-    const masterChapters = (parsed.masterChapters ?? [])
-      .filter((e) => typeof e.num === "number" && typeof e.title === "string")
-      .filter(PART_FILTER);
-    console.log(`[Discovery] Phase B: ${masterChapters.length} chapters`);
-    return {
-      masterChapters,
-      authorPersona: parsed.authorPersona ?? "",
-      powerWords: Array.isArray(parsed.powerWords) ? parsed.powerWords : [],
-    };
-  } catch {
-    return { masterChapters: [], authorPersona: "", powerWords: [] };
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      if (attempt > 1) {
+        const delay = attempt === 2 ? 5_000 : 15_000;
+        console.log(`[Discovery] Phase B attempt ${attempt}, waiting ${delay}ms...`);
+        await new Promise((r) => setTimeout(r, delay));
+      }
+      const result = await ai.models.generateContent({
+        model: "gemini-2.5-pro",
+        contents: `${DISCOVERY_PROMPT}\n\nTEXT:\n${fullText.slice(0, 100_000)}`,
+        config: { temperature: 0.1 },
+      });
+      let raw = (result.text ?? "").trim();
+      raw = raw.replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
+      const parsed = JSON.parse(raw) as { masterChapters?: TocEntry[]; authorPersona?: string; powerWords?: string[] };
+      const masterChapters = (parsed.masterChapters ?? [])
+        .filter((e) => typeof e.num === "number" && typeof e.title === "string")
+        .filter(PART_FILTER);
+      console.log(`[Discovery] Phase B attempt ${attempt}: ${masterChapters.length} chapters`);
+      return {
+        masterChapters,
+        authorPersona: parsed.authorPersona ?? "",
+        powerWords: Array.isArray(parsed.powerWords) ? parsed.powerWords : [],
+      };
+    } catch (e) {
+      console.error(`[Discovery] Phase B attempt ${attempt} failed:`, e);
+    }
   }
+  return { masterChapters: [], authorPersona: "", powerWords: [] };
 }
 
 // ─────────────────────────────────────────────────────────────
