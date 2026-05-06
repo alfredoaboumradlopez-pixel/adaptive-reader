@@ -49,6 +49,9 @@ const masteryStyles: Record<
 
 const LOCAL_STORAGE_KEY = "adaptive-reader-data";
 
+const normalizeTitle = (title: string) =>
+  title.toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ").trim();
+
 function slugify(text: string): string {
   return text
     .replace(/^chapter\s+/i, "")
@@ -188,15 +191,15 @@ export default function HomePage() {
     fileInputRef.current?.click();
   };
 
-  const deleteBook = (bookTitle: string) => {
-    if (!window.confirm(`Remove "${bookTitle}" from your Empire?`)) return;
+  const deleteBook = (slug: string, displayTitle: string) => {
+    if (!window.confirm(`Remove "${displayTitle}" from your Empire?`)) return;
     setGraphState((prev) => {
       const updated = {
-        nodes: prev.nodes.filter((n) => n.bookTitle !== bookTitle),
+        nodes: prev.nodes.filter((n) => normalizeTitle(n.bookTitle) !== slug),
         links: prev.links.filter(
           (l) =>
             !prev.nodes.some(
-              (n) => n.bookTitle === bookTitle && (n.id === l.source || n.id === l.target),
+              (n) => normalizeTitle(n.bookTitle) === slug && (n.id === l.source || n.id === l.target),
             ),
         ),
       };
@@ -507,25 +510,27 @@ export default function HomePage() {
   };
 
   const bookRoster = useMemo(() => {
-    const grouped = new Map<string, EmpireNode[]>();
+    const grouped = new Map<string, { displayTitle: string; nodes: EmpireNode[] }>();
     graphState.nodes.forEach((node) => {
-      const existing = grouped.get(node.bookTitle) ?? [];
-      existing.push(node);
-      grouped.set(node.bookTitle, existing);
+      const slug = normalizeTitle(node.bookTitle);
+      if (!grouped.has(slug)) {
+        grouped.set(slug, { displayTitle: node.bookTitle, nodes: [] });
+      }
+      grouped.get(slug)!.nodes.push(node);
     });
 
-    return Array.from(grouped.entries()).map(([bookTitle, nodes]) => {
+    return Array.from(grouped.entries()).map(([slug, { displayTitle, nodes }]) => {
       const totalNodes = nodes.length;
       const greenNodes = nodes.filter((node) => node.masteryStatus === "Green").length;
       const masteryPercent =
         totalNodes === 0 ? 0 : Math.round((greenNodes / totalNodes) * 100);
-      return { bookTitle, totalNodes, greenNodes, masteryPercent };
+      return { slug, displayTitle, totalNodes, greenNodes, masteryPercent };
     });
   }, [graphState.nodes]);
 
   const selectedBookNodes = useMemo(() => {
     if (!selectedBook) return [];
-    const nodes = graphState.nodes.filter((node) => node.bookTitle === selectedBook);
+    const nodes = graphState.nodes.filter((node) => normalizeTitle(node.bookTitle) === selectedBook);
     return [...nodes].sort((a, b) => {
       // Sort by the numeric suffix of the canonical ID (e.g. "basb-4" → 4)
       const numA = parseInt(a.id.split("-").at(-1) ?? "0", 10);
@@ -633,15 +638,15 @@ export default function HomePage() {
                   <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {bookRoster.map((book) => (
                       <div
-                        key={book.bookTitle}
+                        key={book.slug}
                         className="group relative rounded-2xl border border-white/15 bg-zinc-900/50 p-5 shadow-lg backdrop-blur-xl transition hover:bg-zinc-900/70"
                       >
                         {/* Delete button */}
                         <button
                           type="button"
-                          onClick={() => deleteBook(book.bookTitle)}
+                          onClick={() => deleteBook(book.slug, book.displayTitle)}
                           className="absolute right-3 top-3 rounded-lg p-1.5 text-zinc-600 opacity-0 transition hover:text-rose-400 group-hover:opacity-100"
-                          aria-label={`Delete ${book.bookTitle}`}
+                          aria-label={`Delete ${book.displayTitle}`}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="3 6 5 6 21 6" />
@@ -654,11 +659,11 @@ export default function HomePage() {
                         {/* Card body — click to open */}
                         <button
                           type="button"
-                          onClick={() => setSelectedBook(book.bookTitle)}
+                          onClick={() => setSelectedBook(book.slug)}
                           className="w-full text-left"
                         >
                           <p className="pr-6 text-lg font-semibold tracking-tight text-zinc-100">
-                            {book.bookTitle}
+                            {book.displayTitle}
                           </p>
                           <p className="mt-1 text-sm text-zinc-400">
                             {book.totalNodes} chapter nodes
@@ -688,7 +693,7 @@ export default function HomePage() {
                             The Vault
                           </p>
                           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-50">
-                            {selectedBook}
+                            {bookRoster.find((b) => b.slug === selectedBook)?.displayTitle ?? selectedBook}
                           </h1>
                           <p className="mt-2 text-sm text-zinc-500">
                             {selectedBookNodes.length}{" "}
