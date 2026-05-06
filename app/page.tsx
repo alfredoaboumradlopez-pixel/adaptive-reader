@@ -52,6 +52,16 @@ const LOCAL_STORAGE_KEY = "adaptive-reader-data";
 const normalizeTitle = (title: string) =>
   title.toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ").trim();
 
+// Returns the canonical slug already in the map if this slug is a prefix of it or vice versa.
+// Handles "Getting to Yes" vs "Getting to Yes: Negotiating Agreement Without Giving In".
+function findCanonicalSlug(slug: string, map: Map<string, unknown>): string | null {
+  for (const key of map.keys()) {
+    if (slug === key) return key;
+    if (slug.startsWith(key + " ") || key.startsWith(slug + " ")) return key;
+  }
+  return null;
+}
+
 function slugify(text: string): string {
   return text
     .replace(/^chapter\s+/i, "")
@@ -195,12 +205,16 @@ export default function HomePage() {
     if (!window.confirm(`Remove "${displayTitle}" from your Empire?`)) return;
     setGraphState((prev) => {
       const updated = {
-        nodes: prev.nodes.filter((n) => normalizeTitle(n.bookTitle) !== slug),
+        nodes: prev.nodes.filter((n) => {
+          const s = normalizeTitle(n.bookTitle);
+          return s !== slug && !s.startsWith(slug + " ") && !slug.startsWith(s + " ");
+        }),
         links: prev.links.filter(
           (l) =>
-            !prev.nodes.some(
-              (n) => normalizeTitle(n.bookTitle) === slug && (n.id === l.source || n.id === l.target),
-            ),
+            !prev.nodes.some((n) => {
+              const s = normalizeTitle(n.bookTitle);
+              return (s === slug || s.startsWith(slug + " ") || slug.startsWith(s + " ")) && (n.id === l.source || n.id === l.target);
+            }),
         ),
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
@@ -513,10 +527,11 @@ export default function HomePage() {
     const grouped = new Map<string, { displayTitle: string; nodes: EmpireNode[] }>();
     graphState.nodes.forEach((node) => {
       const slug = normalizeTitle(node.bookTitle);
-      if (!grouped.has(slug)) {
-        grouped.set(slug, { displayTitle: node.bookTitle, nodes: [] });
+      const canonical = findCanonicalSlug(slug, grouped) ?? slug;
+      if (!grouped.has(canonical)) {
+        grouped.set(canonical, { displayTitle: node.bookTitle, nodes: [] });
       }
-      grouped.get(slug)!.nodes.push(node);
+      grouped.get(canonical)!.nodes.push(node);
     });
 
     return Array.from(grouped.entries()).map(([slug, { displayTitle, nodes }]) => {
@@ -530,7 +545,10 @@ export default function HomePage() {
 
   const selectedBookNodes = useMemo(() => {
     if (!selectedBook) return [];
-    const nodes = graphState.nodes.filter((node) => normalizeTitle(node.bookTitle) === selectedBook);
+    const nodes = graphState.nodes.filter((node) => {
+      const s = normalizeTitle(node.bookTitle);
+      return s === selectedBook || s.startsWith(selectedBook + " ") || selectedBook.startsWith(s + " ");
+    });
     return [...nodes].sort((a, b) => {
       // Sort by the numeric suffix of the canonical ID (e.g. "basb-4" → 4)
       const numA = parseInt(a.id.split("-").at(-1) ?? "0", 10);
