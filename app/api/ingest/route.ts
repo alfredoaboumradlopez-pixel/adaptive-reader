@@ -64,6 +64,7 @@ RIGHT:  [{"num":1,"title":"Where It All Started"},{"num":2,"title":"What Is a Se
 - Conclusion / Epilogue / Afterword            → {"num": 99, "title": "Conclusion"}
 - EXCLUDE: Index, Bibliography, Acknowledgments, About the Author, Copyright, Permissions.
 - Be generous — missing a chapter is worse than including one extra.
+ANTI-HALLUCINATION: Only include chapters you can VERIFY exist in the provided text. If you see a chapter title in the TOC but cannot find any content for it in the text, still include it in masterChapters — the extraction phase will handle it. NEVER invent chapter titles that are not present in the TOC or the text itself. If you are unsure whether something is a real chapter, exclude it.
 ━━━━━━━━━━━━━━━━━━━━━━
 
 authorPersona: One sentence describing sentence structure and rhetorical style.
@@ -327,7 +328,14 @@ function buildChapterPrompt(chapter: TocEntry, authorPersona: string, powerWords
   const pwLine = powerWords.length > 0
     ? `Power Words (use these in your sprints): ${powerWords.map((w) => `"${w}"`).join(", ")}`
     : "";
-  return `You are extracting exactly ONE chapter from a book.
+  return `ANTI-HALLUCINATION RULES — MANDATORY:
+1. You are extracting content from the CHAPTER TEXT provided below. Every fact, anecdote, name, number, and quote MUST come from that text.
+2. If the chapter text is too short or empty, return null — do NOT invent content.
+3. NEVER invent stories, examples, statistics, or insights not present in the text.
+4. If you cannot find at least 3 paragraphs of real content for this chapter, respond with exactly: {"hallucination_guard": true}
+5. The narrativeSprints must quote or closely paraphrase actual sentences from the chapter text. If you find yourself writing something that isn't in the text, STOP.
+
+You are extracting exactly ONE chapter from a book.
 
 Target chapter: ${chapter.num}: ${chapter.title}
 Author's voice: ${authorPersona || "Mirror the author's style — use their exact vocabulary, no generic AI summaries."}
@@ -404,8 +412,27 @@ async function extractChapter(
   raw = raw.replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
 
   const parsed = JSON.parse(raw) as Record<string, unknown>;
+
+  // Hallucination guard: model signals insufficient content
+  if (parsed.hallucination_guard === true) {
+    console.warn(`[extractChapter] Ch ${chapter.num} "${chapter.title}" — insufficient text, skipping`);
+    return null;
+  }
+
+  // Content density check
+  const sprints = Array.isArray(parsed.narrativeSprints) ? parsed.narrativeSprints : [];
+  if (sprints.length === 0) return null;
+  const validSprints = sprints.filter((s: unknown) => typeof s === "string" && (s as string).length >= 100);
+  if (validSprints.length === 0) {
+    console.warn(`[extractChapter] Ch ${chapter.num} — sprints too short, likely hallucinated`);
+    return null;
+  }
+
   const goldenThread = typeof parsed.goldenThread === "string" ? parsed.goldenThread.trim() : "";
-  if (!goldenThread) return null;
+  if (!goldenThread || goldenThread.length < 30) {
+    console.warn(`[extractChapter] Ch ${chapter.num} — missing or weak goldenThread`);
+    return null;
+  }
 
   const bookTitle = typeof parsed.bookTitle === "string" ? parsed.bookTitle : "unknown";
   const bookSlug = bookTitle

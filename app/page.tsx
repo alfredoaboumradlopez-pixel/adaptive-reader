@@ -157,7 +157,15 @@ export default function HomePage() {
     try {
       const parsed = JSON.parse(stored) as Partial<GraphPayload>;
       if (Array.isArray(parsed.nodes) && Array.isArray(parsed.links)) {
-        const nodes = (parsed.nodes as EmpireNode[]).map(mergeNodeDefaults);
+        const nodes = (parsed.nodes as EmpireNode[])
+          .map(mergeNodeDefaults)
+          .filter((node) => {
+            // Drop nodes where chapter number doesn't match the node's id suffix
+            const chapterNum = parseInt((node.chapter ?? "").split(":")[0]);
+            const idNum = parseInt((node.id ?? "").split("-").pop() ?? "");
+            if (!isNaN(chapterNum) && !isNaN(idNum) && chapterNum !== idNum) return false;
+            return true;
+          });
         setGraphState({
           nodes,
           links: parsed.links as EmpireLink[],
