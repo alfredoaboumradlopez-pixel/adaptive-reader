@@ -298,21 +298,32 @@ function findChapterWindow(
   nextChapter: TocEntry | null,
 ): string {
   const startIdx = findChapterStart(fullText, chapter);
-  if (startIdx === -1) return "";
+  if (startIdx === -1) {
+    console.warn(`[Sniper] Ch ${chapter.num} "${chapter.title}" — not found in text`);
+    return "";
+  }
 
-  const windowStart = Math.max(0, startIdx - 1_000);
-  let endIdx = startIdx + 50_000;
+  console.log(`[Sniper] Ch ${chapter.num} found at char ${startIdx} (${Math.round(startIdx / 1000)}k of ${Math.round(fullText.length / 1000)}k)`);
+
+  const windowStart = Math.max(0, startIdx - 500);
+  const MINIMUM_WINDOW = 40_000;
+  const MAXIMUM_WINDOW = 90_000;
+
+  let endIdx = startIdx + MAXIMUM_WINDOW;
 
   if (nextChapter) {
     const nextStart = findChapterStart(fullText, nextChapter);
     if (nextStart !== -1 && nextStart > startIdx + 200) {
-      // SOP v11: si nextStart apunta a un PART header, no lo usamos como límite
+      console.log(`[Sniper] Ch ${chapter.num} boundary: ${Math.round(startIdx / 1000)}k → ${Math.round(nextStart / 1000)}k`);
       const surroundingText = fullText.slice(Math.max(0, nextStart - 50), nextStart + 200);
       const isPartBoundary = surroundingText.split("\n").some((line) => PART_HEADER_RE.test(line));
       if (isPartBoundary) {
-        endIdx = Math.min(startIdx + 60_000, fullText.length);
+        // Part boundary — ignore as chapter limit, use maximum window
+        endIdx = startIdx + MAXIMUM_WINDOW;
       } else {
-        endIdx = Math.min(endIdx, nextStart + WINDOW_OVERLAP);
+        const boundaryEnd = nextStart + 2_000;
+        // Enforce minimum window even if next chapter is very close
+        endIdx = Math.max(startIdx + MINIMUM_WINDOW, boundaryEnd);
       }
     }
   }
