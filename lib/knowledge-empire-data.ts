@@ -12,6 +12,9 @@ export type EmpireNode = {
   masteryStatus: MasteryStatus;
   color: string;
   level: 0 | 1 | 2;
+  authorQuote?: string | null;
+  keyMechanism?: string | null;
+  socraticQuestion?: string | null;
 };
 
 export type EmpireLink = {
