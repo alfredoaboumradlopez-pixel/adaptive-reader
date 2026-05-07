@@ -263,31 +263,68 @@ async function runDiscovery(
 const PART_HEADER_RE =
   /^\s*(part|parte|section|sección|unit|módulo|module|book|tema|theme)\s+(one|two|three|four|five|six|seven|eight|nine|ten|\d+)\b/i;
 
-function findChapterStart(fullText: string, chapter: TocEntry): number {
+function findChapterStart(fullText: string, chapter: TocEntry, scanFrom = 0): number {
   const lower = fullText.toLowerCase();
   const titleLower = chapter.title.toLowerCase();
-  const skipToc = Math.min(8_000, Math.floor(fullText.length * 0.05));
 
-  let idx = lower.indexOf(titleLower, skipToc);
-  if (idx !== -1) return idx;
+  // Always skip TOC region AND respect scanFrom
+  const searchFrom = Math.max(scanFrom, Math.min(8_000, Math.floor(fullText.length * 0.05)));
 
-  idx = lower.indexOf(titleLower);
-  if (idx !== -1) return idx;
-
-  for (const pat of [
-    `chapter ${chapter.num}\n`,
-    `chapter ${chapter.num} `,
-    `chapter ${chapter.num}:`,
-    `\n${chapter.num}\n`,
-    `\n${chapter.num} `,
-    `\n${chapter.num}. `,
-    `\n${chapter.num}: `,
-  ]) {
-    idx = lower.indexOf(pat, skipToc);
-    if (idx !== -1) return idx;
+  // Find ALL occurrences of the title in the text
+  const occurrences: number[] = [];
+  let pos = searchFrom;
+  while (pos < fullText.length) {
+    const idx = lower.indexOf(titleLower, pos);
+    if (idx === -1) break;
+    occurrences.push(idx);
+    pos = idx + 1;
   }
 
-  return -1;
+  if (occurrences.length === 0) {
+    // Fallback: chapter number patterns
+    for (const pat of [
+      `chapter ${chapter.num}\n`,
+      `chapter ${chapter.num} `,
+      `chapter ${chapter.num}:`,
+      `\nchapter ${chapter.num}`,
+      `\n${chapter.num}\n`,
+      `\n${chapter.num} `,
+      `\n${chapter.num}. `,
+      `\n${chapter.num}: `,
+    ]) {
+      const idx = lower.indexOf(pat, searchFrom);
+      if (idx !== -1) return idx;
+    }
+    return -1;
+  }
+
+  if (occurrences.length === 1) return occurrences[0];
+
+  // Multiple occurrences — pick the RIGHT one:
+  // Reject occurrences in the last 15% of the book (footnotes/bibliography region)
+  const footnoteZoneStart = Math.floor(fullText.length * 0.85);
+  const bodyOccurrences = occurrences.filter((idx) => idx < footnoteZoneStart);
+
+  if (bodyOccurrences.length > 0) {
+    // Prefer the occurrence that looks like a chapter heading
+    for (const idx of bodyOccurrences) {
+      const before = fullText.slice(Math.max(0, idx - 50), idx).toLowerCase();
+      const after = fullText.slice(idx, idx + 200).toLowerCase();
+      const hasChapterPrefix =
+        before.includes(`chapter ${chapter.num}`) ||
+        before.trim().endsWith("\n") ||
+        /\bchapter\s+\d+\s*$/.test(before.trim());
+      const hasContent =
+        after.length > 100 &&
+        !after.startsWith("1 ") &&
+        !after.match(/^\d+\s+[A-Z][a-z]/);
+      if (hasChapterPrefix || hasContent) return idx;
+    }
+    return bodyOccurrences[0];
+  }
+
+  // All occurrences are in footnote zone — return first one
+  return occurrences[0];
 }
 
 const WINDOW_OVERLAP = 10_000;
@@ -312,7 +349,7 @@ function findChapterWindow(
   let endIdx = startIdx + MAXIMUM_WINDOW;
 
   if (nextChapter) {
-    const nextStart = findChapterStart(fullText, nextChapter);
+    const nextStart = findChapterStart(fullText, nextChapter, startIdx + 500);
     if (nextStart !== -1 && nextStart > startIdx + 200) {
       console.log(`[Sniper] Ch ${chapter.num} boundary: ${Math.round(startIdx / 1000)}k → ${Math.round(nextStart / 1000)}k`);
       const surroundingText = fullText.slice(Math.max(0, nextStart - 50), nextStart + 200);
