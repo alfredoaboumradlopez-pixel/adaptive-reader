@@ -351,7 +351,10 @@ Return a SINGLE raw JSON object (not an array) — no markdown, no preamble:
   "narrativeSprints": ["[sprint 1]", "[sprint 2]", "[sprint 3]", "[optional sprint 4]"],
   "tags": ["keyword1", "keyword2"],
   "masteryStatus": "Red",
-  "level": 1
+  "level": 1,
+  "authorQuote": "[cita textual exacta del autor, o null si no hay una clara]",
+  "keyMechanism": "[NombreConcepto → definición en una línea]",
+  "socraticQuestion": "[pregunta conceptual profunda que requiere haber leído los sprints]"
 }
 
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -391,6 +394,35 @@ Must resolve the curiosity gap opened by supportingContext.
 "id": [book-slug]-${chapter.num}
   book-slug = bookTitle lowercased, spaces→hyphens, non-alphanumeric removed
 "level": 0=Introduction, 1=core chapter, 2=deep-dive/appendix
+
+━━━━━━━━━━━━━━━━━━━━━━
+NEW FIELDS — ADDITIVE
+━━━━━━━━━━━━━━━━━━━━━━
+"authorQuote": A VERBATIM quote from the chapter text — the author's exact words, in quotation marks.
+- Must be a real sentence or phrase from the chapter text provided
+- Maximum 2 sentences
+- Choose a phrase that captures the chapter's philosophy or a memorable insight
+- If no clear quotable sentence exists, return null
+- NEVER invent or paraphrase — verbatim only
+GOOD: "We only know what we make." (if this exact phrase appears in the text)
+BAD: "Forte says that making things helps us learn" (that's paraphrase, not a quote)
+
+"keyMechanism": The central concept or tool introduced in this chapter, in format:
+"ConceptName → one-line definition using the author's own vocabulary"
+Examples:
+- "PARA → organizes information by actionability rather than category"
+- "Progressive Summarization → distills notes in layers to make knowledge rediscoverable"
+- "Intermediate Packets → discrete, reusable units of work assembled into final products"
+If the chapter doesn't introduce a named mechanism, describe the core insight:
+- "Resonance → the intuitive signal that something is worth capturing"
+
+"socraticQuestion": One conceptual question that can ONLY be answered after understanding the chapter.
+NOT trivia. NOT "what is X called?"
+YES: deep conceptual questions that require synthesis.
+Examples:
+- "Why does organizing information by topic create digital graveyards instead of useful knowledge?"
+- "What is the difference between consuming information and expressing it, and why does it matter for memory?"
+- "Why is the feeling of resonance a more reliable capture filter than analytical checklists?"
 
 Return ONLY the raw JSON object.`;
 }
