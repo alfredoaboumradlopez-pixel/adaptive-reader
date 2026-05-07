@@ -306,24 +306,25 @@ function findChapterStart(fullText: string, chapter: TocEntry, scanFrom = 0): nu
   const bodyOccurrences = occurrences.filter((idx) => idx < footnoteZoneStart);
 
   if (bodyOccurrences.length > 0) {
-    // Prefer the occurrence that looks like a chapter heading
-    for (const idx of bodyOccurrences) {
-      const before = fullText.slice(Math.max(0, idx - 50), idx).toLowerCase();
-      const after = fullText.slice(idx, idx + 200).toLowerCase();
-      const hasChapterPrefix =
-        before.includes(`chapter ${chapter.num}`) ||
-        before.trim().endsWith("\n") ||
-        /\bchapter\s+\d+\s*$/.test(before.trim());
-      const hasContent =
-        after.length > 100 &&
-        !after.startsWith("1 ") &&
-        !after.match(/^\d+\s+[A-Z][a-z]/);
-      if (hasChapterPrefix || hasContent) return idx;
-    }
     return bodyOccurrences[0];
   }
 
-  // All occurrences are in footnote zone — return first one
+  // All title occurrences are in footnote zone — try chapter number patterns in body first
+  for (const pat of [
+    `chapter ${chapter.num}\n`,
+    `chapter ${chapter.num} `,
+    `chapter ${chapter.num}:`,
+    `\nchapter ${chapter.num}`,
+    `\n${chapter.num}\n`,
+    `\n${chapter.num} `,
+    `\n${chapter.num}. `,
+    `\n${chapter.num}: `,
+  ]) {
+    const numIdx = lower.indexOf(pat, searchFrom);
+    if (numIdx !== -1 && numIdx < footnoteZoneStart) return numIdx;
+  }
+
+  // Last resort: return first footnote occurrence
   return occurrences[0];
 }
 
@@ -349,7 +350,7 @@ function findChapterWindow(
   let endIdx = startIdx + MAXIMUM_WINDOW;
 
   if (nextChapter) {
-    const nextStart = findChapterStart(fullText, nextChapter, startIdx + 500);
+    const nextStart = findChapterStart(fullText, nextChapter);
     if (nextStart !== -1 && nextStart > startIdx + 200) {
       console.log(`[Sniper] Ch ${chapter.num} boundary: ${Math.round(startIdx / 1000)}k → ${Math.round(nextStart / 1000)}k`);
       const surroundingText = fullText.slice(Math.max(0, nextStart - 50), nextStart + 200);
