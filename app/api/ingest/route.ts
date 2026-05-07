@@ -120,51 +120,53 @@ async function extractNativeOutline(buffer: ArrayBuffer): Promise<TocEntry[]> {
 // ── Layer 2: TOC Regex Parser ────────────────────────────────
 
 function extractTocFromText(fullText: string): TocEntry[] {
-  const tocPatterns = [/\bcontents\b/i, /\btable of contents\b/i, /\bíndice\b/i, /\bcontenido\b/i];
+  // Search for TOC anywhere in the first 150k chars
+  const searchRegion = fullText.slice(0, 150_000);
+  const lower = searchRegion.toLowerCase();
+
   let tocStart = -1;
-  for (const pat of tocPatterns) {
-    const match = fullText.search(pat);
-    if (match !== -1 && (tocStart === -1 || match < tocStart)) tocStart = match;
+  for (const marker of ["table of contents", "contents\n", "\ncontents\n", "índice\n", "contenido\n"]) {
+    const idx = lower.indexOf(marker);
+    if (idx !== -1 && (tocStart === -1 || idx < tocStart)) tocStart = idx;
   }
   if (tocStart === -1) return [];
 
-  const tocRegion = fullText.slice(tocStart, tocStart + 8_000);
+  const tocRegion = searchRegion.slice(tocStart, tocStart + 10_000);
+  const lines = tocRegion.split("\n").map((l) => l.trim()).filter(Boolean);
   const entries: TocEntry[] = [];
 
-  for (const line of tocRegion.split("\n")) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.length < 4) continue;
+  for (const line of lines) {
+    if (/^(part|parte|section|sección)\s+(one|two|three|four|five|\d+)/i.test(line)) continue;
+    if (line.length < 5 || /^\d+$/.test(line)) continue;
+    if (/^(index|bibliography|acknowledgment|about the author|notes|appendix)/i.test(line)) continue;
 
-    // "Chapter N: Title" or "Chapter N  Title"
-    const chapterMatch = trimmed.match(/^chapter\s+(\d+)[:\s]+(.+?)(?:\s*\.{2,}\s*\d+)?$/i);
-    if (chapterMatch) {
-      entries.push({ num: parseInt(chapterMatch[1]), title: chapterMatch[2].trim() });
+    const chMatch = line.match(/^chapter\s+(\d+)[:\s—–-]+(.+?)(?:\s*\.{2,}\s*\d+)?$/i);
+    if (chMatch) {
+      entries.push({ num: parseInt(chMatch[1]), title: chMatch[2].replace(/\.{2,}\s*\d+$/, "").trim() });
       continue;
     }
 
-    // "1. Title" or "1  Title" (1-2 digit prefix)
-    const numberedMatch = trimmed.match(/^(\d{1,2})[.\s]\s+([A-Z].{3,60})(?:\s*\.{2,}\s*\d+)?$/);
-    if (numberedMatch) {
-      const title = numberedMatch[2].trim();
-      if (!/^(part|parte|section)/i.test(title)) {
-        entries.push({ num: parseInt(numberedMatch[1]), title });
-      }
+    const numMatch = line.match(/^(\d{1,2})[.\s:—–]\s*([A-Z].{4,70})(?:\s*\.{2,}\s*\d+)?$/);
+    if (numMatch) {
+      const title = numMatch[2].replace(/\.{2,}\s*\d+$/, "").trim();
+      if (title.length > 4) entries.push({ num: parseInt(numMatch[1]), title });
       continue;
     }
 
-    // Standalone "Introduction" / "Conclusion" lines
-    if (/^(introduction|preface|prologue|conclusion|epilogue)\b/i.test(trimmed) && trimmed.length < 50) {
-      entries.push({ num: 0, title: trimmed.replace(/\s*\.{2,}\s*\d+$/, "").trim() });
+    if (/^(introduction|preface|prologue|conclusion|epilogue|afterword)\b/i.test(line) && line.length < 60) {
+      const isIntro = /^(introduction|preface|prologue)/i.test(line);
+      entries.push({ num: isIntro ? 0 : 99, title: line.replace(/\.{2,}\s*\d+$/, "").trim() });
     }
   }
 
-  if (entries.length < 3) return [];
-
-  return entries
+  const result = entries
     .filter(PART_FILTER)
     .map(NORMALIZE_ENTRY)
     .filter((e, i, arr) => arr.findIndex((x) => x.num === e.num) === i)
     .sort((a, b) => a.num - b.num);
+
+  console.log(`[Discovery] Layer 2 TOC found at char ${tocStart}, extracted ${result.length} chapters`);
+  return result.length >= 3 ? result : [];
 }
 
 // ── Layer 3: Gemini (fallback, with retries) ─────────────────
@@ -182,7 +184,7 @@ async function geminiDiscovery(
       }
       const result = await ai.models.generateContent({
         model: "gemini-2.5-pro",
-        contents: `${DISCOVERY_PROMPT}\n\nTEXT:\n${fullText.slice(0, 200_000)}`,
+        contents: `${DISCOVERY_PROMPT}\n\nTEXT:\n${fullText.slice(0, 120_000)}\n\n[...middle of book...]\n\n${fullText.slice(-80_000)}`,
         config: { temperature: 0.1 },
       });
       let raw = (result.text ?? "").trim().replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
