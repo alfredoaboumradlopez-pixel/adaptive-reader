@@ -434,6 +434,8 @@ async function extractChapter(
     return null;
   }
 
+  console.log(`[extractChapter] Ch ${chapter.num} "${chapter.title}" — passed all guards, emitting node`);
+
   const bookTitle = typeof parsed.bookTitle === "string" ? parsed.bookTitle : "unknown";
   const bookSlug = bookTitle
     .toLowerCase()
@@ -510,6 +512,7 @@ export async function POST(request: NextRequest): Promise<Response> {
                 return;
               }
             } catch (e) {
+              console.error(`[extractChapter] Ch ${chapter.num} FAILED:`, e instanceof Error ? e.message : String(e));
               if (attempt === MAX_ATTEMPTS) {
                 completedCount++;
                 send({ type: "skip", chapterNum: chapter.num, chapterTitle: chapter.title, reason: String(e) });
