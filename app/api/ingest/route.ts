@@ -185,7 +185,11 @@ async function geminiDiscovery(
       }
       const result = await ai.models.generateContent({
         model: "gemini-2.5-pro",
-        contents: `${DISCOVERY_PROMPT}\n\nTEXT:\n${fullText.slice(0, 120_000)}\n\n[...middle of book...]\n\n${fullText.slice(-80_000)}`,
+        contents: (() => {
+          const FULL_BOOK_CAP = 800_000;
+          const discoveryText = fullText.length <= FULL_BOOK_CAP ? fullText : fullText.slice(0, FULL_BOOK_CAP);
+          return `${DISCOVERY_PROMPT}\n\nTEXT:\n${discoveryText}`;
+        })(),
         config: { temperature: 0.1 },
       });
       let raw = (result.text ?? "").trim().replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
@@ -266,66 +270,44 @@ const PART_HEADER_RE =
 function findChapterStart(fullText: string, chapter: TocEntry, scanFrom = 0): number {
   const lower = fullText.toLowerCase();
   const titleLower = chapter.title.toLowerCase();
-
-  // Always skip TOC region AND respect scanFrom
   const searchFrom = Math.max(scanFrom, Math.min(8_000, Math.floor(fullText.length * 0.05)));
-
-  // Find ALL occurrences of the title in the text
-  const occurrences: number[] = [];
-  let pos = searchFrom;
-  while (pos < fullText.length) {
-    const idx = lower.indexOf(titleLower, pos);
-    if (idx === -1) break;
-    occurrences.push(idx);
-    pos = idx + 1;
-  }
-
-  if (occurrences.length === 0) {
-    // Fallback: chapter number patterns
-    for (const pat of [
-      `chapter ${chapter.num}\n`,
-      `chapter ${chapter.num} `,
-      `chapter ${chapter.num}:`,
-      `\nchapter ${chapter.num}`,
-      `\n${chapter.num}\n`,
-      `\n${chapter.num} `,
-      `\n${chapter.num}. `,
-      `\n${chapter.num}: `,
-    ]) {
-      const idx = lower.indexOf(pat, searchFrom);
-      if (idx !== -1) return idx;
-    }
-    return -1;
-  }
-
-  if (occurrences.length === 1) return occurrences[0];
-
-  // Multiple occurrences — pick the RIGHT one:
-  // Reject occurrences in the last 15% of the book (footnotes/bibliography region)
   const footnoteZoneStart = Math.floor(fullText.length * 0.85);
-  const bodyOccurrences = occurrences.filter((idx) => idx < footnoteZoneStart);
 
-  if (bodyOccurrences.length > 0) {
-    return bodyOccurrences[0];
+  // Build whitespace-tolerant regex: each space → \s+ to handle line-wrapped headings
+  const escaped = titleLower.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const flexiblePattern = escaped.replace(/\s+/g, "\\s+");
+  let titleRegex: RegExp;
+  try {
+    titleRegex = new RegExp(flexiblePattern, "g");
+  } catch {
+    titleRegex = new RegExp("(?!x)x");
   }
 
-  // All title occurrences are in footnote zone — try chapter number patterns in body first
-  for (const pat of [
-    `chapter ${chapter.num}\n`,
-    `chapter ${chapter.num} `,
-    `chapter ${chapter.num}:`,
-    `\nchapter ${chapter.num}`,
-    `\n${chapter.num}\n`,
-    `\n${chapter.num} `,
-    `\n${chapter.num}. `,
-    `\n${chapter.num}: `,
-  ]) {
+  const occurrences: number[] = [];
+  titleRegex.lastIndex = searchFrom;
+  let match: RegExpExecArray | null;
+  while ((match = titleRegex.exec(lower)) !== null) {
+    occurrences.push(match.index);
+    if (match.index === titleRegex.lastIndex) titleRegex.lastIndex++;
+  }
+
+  // Prefer body occurrences (before footnote zone)
+  const bodyOccurrences = occurrences.filter((idx) => idx < footnoteZoneStart);
+  if (bodyOccurrences.length > 0) return bodyOccurrences[0];
+
+  // Fallback: chapter number patterns in body
+  const numberPatterns = [
+    `chapter ${chapter.num}\n`, `chapter ${chapter.num} `, `chapter ${chapter.num}:`,
+    `\nchapter ${chapter.num}`, `\n${chapter.num}\n`, `\n${chapter.num} `,
+    `\n${chapter.num}. `, `\n${chapter.num}: `,
+  ];
+  for (const pat of numberPatterns) {
     const numIdx = lower.indexOf(pat, searchFrom);
     if (numIdx !== -1 && numIdx < footnoteZoneStart) return numIdx;
   }
 
-  // Last resort: return first footnote occurrence
-  return occurrences[0];
+  if (occurrences.length > 0) return occurrences[0];
+  return -1;
 }
 
 const WINDOW_OVERLAP = 10_000;
