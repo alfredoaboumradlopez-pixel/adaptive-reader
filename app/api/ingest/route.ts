@@ -38,8 +38,10 @@ export type StreamEvent =
   | { type: "error"; message: string };
 
 // ─────────────────────────────────────────────────────────────
-// PHASE 1 — DISCOVERY PASS (Blueprint)
-// SOP v11: prompt agresivo que aplana PARTE → CAPÍTULO
+// DISCOVERY — 3-LAYER UNIVERSAL PIPELINE
+// Layer 1: PDF native outline (deterministic, 0 AI calls)
+// Layer 2: TOC regex parser  (deterministic, 0 AI calls)
+// Layer 3: Gemini full discovery (fallback)
 // ─────────────────────────────────────────────────────────────
 
 const DISCOVERY_PROMPT = `You are a book architect. Your ONLY job is to build the Blueprint for this book.
@@ -53,181 +55,201 @@ Analyze the text and return a raw JSON object (no markdown, no explanation) with
 }
 
 ━━━━━━━━━━━━━━━━━━━━━━
-LEAF-NODE PROTOCOL (SOP v11) — THIS OVERRIDES EVERYTHING ELSE
+LEAF-NODE PROTOCOL — THIS OVERRIDES EVERYTHING ELSE
 ━━━━━━━━━━━━━━━━━━━━━━
-Many books use this hierarchy: PARTS that contain CHAPTERS.
-
-Example structure:
-  PART ONE: The Foundation
-    Chapter 1: Where It All Started
-    Chapter 2: What Is a Second Brain?
-  PART TWO: The Method
-    Chapter 3: Capture
-    Chapter 4: Organize
-
-RULE 1: PARTS are containers. They have zero content of their own.
-NEVER include Part, Section, Unit, Module, Theme, or Book in masterChapters. Ever.
-
-RULE 2: Extract ONLY the leaf nodes — the actual numbered chapters with real content.
-Correct output for the example: [Ch1, Ch2, Ch3, Ch4]. Parts never appear.
-
-RULE 3: Number chapters sequentially (1, 2, 3...) across all Parts.
-Do NOT reset numbering per Part.
-
-RULE 4: Flatten completely and aggressively.
-WRONG: [{"num":1,"title":"PART ONE: The Foundation"}, {"num":2,"title":"PART TWO: The Method"}]
-RIGHT:  [{"num":1,"title":"Where It All Started"}, {"num":2,"title":"What Is a Second Brain?"}, {"num":3,"title":"Capture"}, {"num":4,"title":"Organize"}]
-
-RULE 5: Missing a chapter is always worse than including one extra. Be generous.
-━━━━━━━━━━━━━━━━━━━━━━
-
-masterChapters rules:
-- CRITICAL — LEAF-NODE PROTOCOL: If the book uses PARTS containing CHAPTERS, list ONLY the chapters inside each Part — NEVER the Parts themselves. Flatten completely: Part1→Ch1,Ch2 / Part2→Ch3,Ch4 → masterChapters=[Ch1,Ch2,Ch3,Ch4]. Parts are containers with zero content. Missing a chapter is worse than one extra.
-- WRONG: [{'num':1,'title':'PART ONE: Foundation'},{'num':2,'title':'PART TWO: Method'}]
-- RIGHT:  [{'num':1,'title':'Where It All Started'},{'num':2,'title':'What Is a Second Brain?'},{'num':3,'title':'Capture'},{'num':4,'title':'Organize'}]
-- Include ONLY the smallest content units with real content. Never include Parts, Sections, Units, or Modules.
+PARTS are containers. Extract ONLY the leaf chapters inside each Part — never the Parts themselves.
+WRONG: [{"num":1,"title":"PART ONE: Foundation"},{"num":2,"title":"PART TWO: Method"}]
+RIGHT:  [{"num":1,"title":"Where It All Started"},{"num":2,"title":"What Is a Second Brain?"},{"num":3,"title":"Capture"},{"num":4,"title":"Organize"}]
 - Preface / Introduction / Prologue / Foreword → {"num": 0, "title": "Introduction"}
 - Conclusion / Epilogue / Afterword            → {"num": 99, "title": "Conclusion"}
-- EXCLUDE entirely: Index, Bibliography, Acknowledgments, Credits, About the Author,
-  Praise for..., Further Reading, Also by the Author, Copyright, Permissions.
+- EXCLUDE: Index, Bibliography, Acknowledgments, About the Author, Copyright, Permissions.
 - Be generous — missing a chapter is worse than including one extra.
+━━━━━━━━━━━━━━━━━━━━━━
 
 authorPersona: One sentence describing sentence structure and rhetorical style.
 powerWords: Exactly 5 of the author's recurring metaphors, coined terms, or signature vocabulary.
 
 Return ONLY the raw JSON object.`;
 
-const TOC_SNIPER_PROMPT = `You are analyzing the opening section of a book PDF. Your ONLY job is to find and extract the Table of Contents.
+// ── Shared post-processing ───────────────────────────────────
 
-The Table of Contents is a page (usually titled "Contents", "Table of Contents", or just a list of chapter titles with page numbers) that appears in the first pages of the book.
+const PART_FILTER = (e: TocEntry): boolean => {
+  const lower = e.title.toLowerCase().trim();
+  return !/^(part|parte|section|sección|unit|módulo|module|book|tema)\s+(one|two|three|four|five|six|seven|eight|nine|ten|\d+)/i.test(lower);
+};
 
-STEP 1: Locate the Table of Contents page in the text.
-STEP 2: Extract ALL entries that are actual chapters (leaf nodes with real content).
+const NORMALIZE_ENTRY = (e: TocEntry): TocEntry => {
+  const lower = e.title.toLowerCase().trim();
+  if (/^(introduction|preface|prologue|foreword|prefacio|introducción)/.test(lower)) return { ...e, num: 0 };
+  if (/^(conclusion|epilogue|afterword|epilogo|conclusión)/.test(lower)) return { ...e, num: 99 };
+  return e;
+};
 
-CRITICAL RULES:
-- Extract ONLY leaf chapters — the actual numbered reading units
-- "Part One", "Part Two", "Part Three" etc. are CONTAINERS, not chapters. NEVER include them.
-- Every chapter INSIDE a Part must be included individually
-- Preface/Introduction/Prologue → {"num": 0, "title": "Introduction"}
-- Conclusion/Epilogue → {"num": 99, "title": "Conclusion"}
-- Exclude: Index, Bibliography, Acknowledgments, About the Author, Notes, Copyright
+// ── Layer 1: PDF Native Outline ──────────────────────────────
 
-EXAMPLE — if the TOC shows:
-  Part One: Remember
-    1. Where It All Started .............. 23
-    2. What Is a Second Brain? ........... 41
-  Part Two: Connect
-    3. How a Captain Keeps His Ship ...... 67
-    4. Capture ........................... 89
+async function extractNativeOutline(buffer: ArrayBuffer): Promise<TocEntry[]> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const PDFParser = require("pdf2json");
+    const parser = new PDFParser();
 
-CORRECT output:
-{"masterChapters": [{"num":0,"title":"Introduction"},{"num":1,"title":"Where It All Started"},{"num":2,"title":"What Is a Second Brain?"},{"num":3,"title":"How a Captain Keeps His Ship"},{"num":4,"title":"Capture"}], "authorPersona": "", "powerWords": []}
+    const data = await new Promise<Record<string, unknown>>((resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      parser.on("pdfParser_dataReady", (d: any) => resolve(d));
+      parser.on("pdfParser_dataError", reject);
+      parser.parseBuffer(Buffer.from(buffer));
+    });
 
-WRONG output (never do this):
-{"masterChapters": [{"num":1,"title":"Part One: Remember"},{"num":2,"title":"Part Two: Connect"}]}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const bookmarks: any[] = (data as any)?.formImage?.Bookmarks ?? [];
+    if (!bookmarks.length) return [];
 
-If you cannot find a Table of Contents in this text, return:
-{"masterChapters": [], "authorPersona": "", "powerWords": []}
+    const chapters: TocEntry[] = [];
+    let num = 1;
+    for (const bm of bookmarks) {
+      const title = decodeURIComponent((bm.title as string) ?? "").trim();
+      if (title) chapters.push({ num: num++, title });
+    }
 
-Return ONLY raw JSON. No markdown. No explanation.`;
+    return chapters.filter(PART_FILTER).map(NORMALIZE_ENTRY);
+  } catch {
+    return [];
+  }
+}
 
-async function runDiscovery(
+// ── Layer 2: TOC Regex Parser ────────────────────────────────
+
+function extractTocFromText(fullText: string): TocEntry[] {
+  const tocPatterns = [/\bcontents\b/i, /\btable of contents\b/i, /\bíndice\b/i, /\bcontenido\b/i];
+  let tocStart = -1;
+  for (const pat of tocPatterns) {
+    const match = fullText.search(pat);
+    if (match !== -1 && (tocStart === -1 || match < tocStart)) tocStart = match;
+  }
+  if (tocStart === -1) return [];
+
+  const tocRegion = fullText.slice(tocStart, tocStart + 8_000);
+  const entries: TocEntry[] = [];
+
+  for (const line of tocRegion.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.length < 4) continue;
+
+    // "Chapter N: Title" or "Chapter N  Title"
+    const chapterMatch = trimmed.match(/^chapter\s+(\d+)[:\s]+(.+?)(?:\s*\.{2,}\s*\d+)?$/i);
+    if (chapterMatch) {
+      entries.push({ num: parseInt(chapterMatch[1]), title: chapterMatch[2].trim() });
+      continue;
+    }
+
+    // "1. Title" or "1  Title" (1-2 digit prefix)
+    const numberedMatch = trimmed.match(/^(\d{1,2})[.\s]\s+([A-Z].{3,60})(?:\s*\.{2,}\s*\d+)?$/);
+    if (numberedMatch) {
+      const title = numberedMatch[2].trim();
+      if (!/^(part|parte|section)/i.test(title)) {
+        entries.push({ num: parseInt(numberedMatch[1]), title });
+      }
+      continue;
+    }
+
+    // Standalone "Introduction" / "Conclusion" lines
+    if (/^(introduction|preface|prologue|conclusion|epilogue)\b/i.test(trimmed) && trimmed.length < 50) {
+      entries.push({ num: 0, title: trimmed.replace(/\s*\.{2,}\s*\d+$/, "").trim() });
+    }
+  }
+
+  if (entries.length < 3) return [];
+
+  return entries
+    .filter(PART_FILTER)
+    .map(NORMALIZE_ENTRY)
+    .filter((e, i, arr) => arr.findIndex((x) => x.num === e.num) === i)
+    .sort((a, b) => a.num - b.num);
+}
+
+// ── Layer 3: Gemini (fallback, with retries) ─────────────────
+
+async function geminiDiscovery(
   ai: GoogleGenAI,
   fullText: string,
 ): Promise<{ masterChapters: TocEntry[]; authorPersona: string; powerWords: string[] }> {
-  // DEBUG: show where TOC lives
-  const tocMarkers = ["contents", "chapter 1", "chapter one", "part one", "where it all started"];
-  for (const marker of tocMarkers) {
-    const pos = fullText.toLowerCase().indexOf(marker);
-    if (pos !== -1) console.log(`[TOC-DEBUG] "${marker}" found at char ${pos}`);
-  }
-  console.log(`[TOC-DEBUG] Total text length: ${fullText.length} chars`);
-
-  const PART_FILTER = (e: TocEntry) => {
-    const lower = e.title.toLowerCase().trim();
-    return !/^(part|parte|section|sección|unit|módulo|module|book|tema)\s+(one|two|three|four|five|six|seven|eight|nine|ten|\d+)/i.test(lower);
-  };
-
-  const parseAndFilter = (raw: string): TocEntry[] => {
-    try {
-      const cleaned = raw.replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
-      const parsed = JSON.parse(cleaned) as { masterChapters?: TocEntry[] };
-      return (parsed.masterChapters ?? [])
-        .filter((e) => typeof e.num === "number" && typeof e.title === "string")
-        .filter(PART_FILTER);
-    } catch {
-      return [];
-    }
-  };
-
-  // ── Phase A: TOC Sniper — first 15k chars ────────────────────────────────
-  try {
-    const tocChunk = fullText.slice(0, 40_000);
-    const tocResult = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
-      contents: `${TOC_SNIPER_PROMPT}\n\nTEXT:\n${tocChunk}`,
-      config: { temperature: 0.0 },
-    });
-    const tocChapters = parseAndFilter((tocResult.text ?? "").trim());
-    console.log(`[Discovery] Phase A TOC Sniper: ${tocChapters.length} chapters`);
-
-    if (tocChapters.length >= 3) {
-      const bodyChunk = fullText.slice(0, 100_000);
-      const personaResult = await ai.models.generateContent({
-        model: "gemini-2.5-pro",
-        contents: `From this book text, return ONLY a raw JSON with two fields:
-{"authorPersona": "One sentence describing the author's rhetorical style", "powerWords": ["word1","word2","word3","word4","word5"]}
-No markdown. No preamble.\n\nTEXT:\n${bodyChunk}`,
-        config: { temperature: 0.1 },
-      });
-      let personaRaw = (personaResult.text ?? "").trim();
-      personaRaw = personaRaw.replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
-      let authorPersona = "";
-      let powerWords: string[] = [];
-      try {
-        const p = JSON.parse(personaRaw) as { authorPersona?: string; powerWords?: string[] };
-        authorPersona = p.authorPersona ?? "";
-        powerWords = Array.isArray(p.powerWords) ? p.powerWords : [];
-      } catch { /* use defaults */ }
-
-      console.log(`[Discovery] Phase A success: ${tocChapters.length} chapters | persona: "${authorPersona}"`);
-      return { masterChapters: tocChapters, authorPersona, powerWords };
-    }
-  } catch (e) {
-    console.warn("[Discovery] Phase A failed:", e);
-  }
-
-  // ── Phase B: Full scan — first 100k chars (fallback, up to 3 attempts) ──────
-  console.log("[Discovery] Phase A insufficient, running Phase B full scan...");
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       if (attempt > 1) {
         const delay = attempt === 2 ? 5_000 : 15_000;
-        console.log(`[Discovery] Phase B attempt ${attempt}, waiting ${delay}ms...`);
+        console.log(`[Discovery] Layer 3 attempt ${attempt}, waiting ${delay}ms...`);
         await new Promise((r) => setTimeout(r, delay));
       }
       const result = await ai.models.generateContent({
         model: "gemini-2.5-pro",
-        contents: `${DISCOVERY_PROMPT}\n\nTEXT:\n${fullText.slice(0, 100_000)}`,
+        contents: `${DISCOVERY_PROMPT}\n\nTEXT:\n${fullText.slice(0, 200_000)}`,
         config: { temperature: 0.1 },
       });
-      let raw = (result.text ?? "").trim();
-      raw = raw.replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
+      let raw = (result.text ?? "").trim().replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
       const parsed = JSON.parse(raw) as { masterChapters?: TocEntry[]; authorPersona?: string; powerWords?: string[] };
       const masterChapters = (parsed.masterChapters ?? [])
         .filter((e) => typeof e.num === "number" && typeof e.title === "string")
-        .filter(PART_FILTER);
-      console.log(`[Discovery] Phase B attempt ${attempt}: ${masterChapters.length} chapters`);
+        .filter(PART_FILTER)
+        .map(NORMALIZE_ENTRY);
+      console.log(`[Discovery] Layer 3 attempt ${attempt}: ${masterChapters.length} chapters`);
       return {
         masterChapters,
         authorPersona: parsed.authorPersona ?? "",
         powerWords: Array.isArray(parsed.powerWords) ? parsed.powerWords : [],
       };
     } catch (e) {
-      console.error(`[Discovery] Phase B attempt ${attempt} failed:`, e);
+      console.error(`[Discovery] Layer 3 attempt ${attempt} failed:`, e);
     }
   }
   return { masterChapters: [], authorPersona: "", powerWords: [] };
+}
+
+async function geminiPersonaOnly(
+  ai: GoogleGenAI,
+  fullText: string,
+): Promise<{ authorPersona: string; powerWords: string[] }> {
+  try {
+    const result = await ai.models.generateContent({
+      model: "gemini-2.5-pro",
+      contents: `From this book text, return ONLY raw JSON with two fields:
+{"authorPersona": "One sentence describing the author's rhetorical style and sentence structure", "powerWords": ["word1","word2","word3","word4","word5"]}
+No markdown. No preamble.\n\nTEXT:\n${fullText.slice(0, 50_000)}`,
+      config: { temperature: 0.1 },
+    });
+    const raw = (result.text ?? "").trim().replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
+    const p = JSON.parse(raw) as { authorPersona?: string; powerWords?: string[] };
+    return { authorPersona: p.authorPersona ?? "", powerWords: Array.isArray(p.powerWords) ? p.powerWords : [] };
+  } catch {
+    return { authorPersona: "", powerWords: [] };
+  }
+}
+
+// ── Main orchestrator ────────────────────────────────────────
+
+async function runDiscovery(
+  ai: GoogleGenAI,
+  fullText: string,
+  buffer: ArrayBuffer,
+): Promise<{ masterChapters: TocEntry[]; authorPersona: string; powerWords: string[] }> {
+  // Layer 1: PDF native outline
+  const outlineChapters = await extractNativeOutline(buffer);
+  console.log(`[Discovery] Layer 1 (Native Outline): ${outlineChapters.length} chapters`);
+  if (outlineChapters.length >= 3) {
+    const { authorPersona, powerWords } = await geminiPersonaOnly(ai, fullText);
+    return { masterChapters: outlineChapters, authorPersona, powerWords };
+  }
+
+  // Layer 2: TOC regex
+  const regexChapters = extractTocFromText(fullText);
+  console.log(`[Discovery] Layer 2 (TOC Regex): ${regexChapters.length} chapters`);
+  if (regexChapters.length >= 3) {
+    const { authorPersona, powerWords } = await geminiPersonaOnly(ai, fullText);
+    return { masterChapters: regexChapters, authorPersona, powerWords };
+  }
+
+  // Layer 3: Gemini
+  console.log(`[Discovery] Layer 3 (Gemini): running...`);
+  return geminiDiscovery(ai, fullText);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -419,7 +441,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
         // Phase 1: Discovery — SOP v11 flattened TOC
         const { masterChapters, authorPersona, powerWords } =
-          await runDiscovery(ai, fullText);
+          await runDiscovery(ai, fullText, buffer);
 
         send({
           type: "toc",
