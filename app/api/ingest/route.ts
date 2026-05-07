@@ -378,6 +378,19 @@ ONE chapter → ONE JSON object. Array = failure.
 ━━━━━━━━━━━━━━━━━━━━━━
 SPRINTS — narrativeSprints — EXACTLY 3 TO 4 STRINGS
 ━━━━━━━━━━━━━━━━━━━━━━
+VOICE PRESERVATION — MANDATORY:
+Before writing any sprint, identify the grammatical person the author uses in the chapter text:
+- First person ("I", "my", "we", "our") → write all sprints in first person
+- Third person ("he", "she", "they", "his", "her") → write all sprints in third person
+- Second person ("you", "your") → write all sprints in second person
+
+NEVER convert between persons. If the author writes "I joined the Peace Corps",
+the sprint must say "I joined the Peace Corps" — not "he joined the Peace Corps".
+If the author writes "the protagonist discovered", the sprint must say
+"the protagonist discovered" — not "I discovered".
+
+This is the most important voice rule. Violating it destroys the author's DNA.
+
 Each string: 4 to 5 sentences of flowing prose. NO bullet points. NO numbered lists.
 Sprint 1: One concrete, tactile scene from this chapter.
 Sprint 2: The core mechanism in the author's EXACT vocabulary.
