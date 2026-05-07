@@ -450,7 +450,7 @@ async function extractChapter(
   const result = await ai.models.generateContent({
     model: "gemini-2.5-pro",
     contents: `${buildChapterPrompt(chapter, authorPersona, powerWords)}\n\nCHAPTER TEXT:\n${chapterText}`,
-    config: { temperature: 0.2 },
+    config: { temperature: 0.2, timeout: 120_000 },
   });
 
   let raw = (result.text ?? "").trim();
@@ -557,7 +557,11 @@ export async function POST(request: NextRequest): Promise<Response> {
                 return;
               }
             } catch (e) {
-              console.error(`[extractChapter] Ch ${chapter.num} FAILED:`, e instanceof Error ? e.message : String(e));
+              console.error(
+                `[POST] Ch ${chapter.num} "${chapter.title}" FAILED at char ${
+                  fullText.toLowerCase().indexOf(chapter.title.toLowerCase())
+                } — ${e instanceof Error ? e.message : String(e)}`
+              );
               if (attempt === MAX_ATTEMPTS) {
                 completedCount++;
                 send({ type: "skip", chapterNum: chapter.num, chapterTitle: chapter.title, reason: String(e) });
