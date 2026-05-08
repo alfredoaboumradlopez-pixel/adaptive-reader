@@ -175,7 +175,7 @@ function extractTocFromText(fullText: string): TocEntry[] {
 async function geminiDiscovery(
   ai: GoogleGenAI,
   fullText: string,
-): Promise<{ masterChapters: TocEntry[]; authorPersona: string; powerWords: string[] }> {
+): Promise<{ masterChapters: TocEntry[]; authorPersona: string; powerWords: string[]; bookTitle: string }> {
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       if (attempt > 1) {
@@ -193,7 +193,7 @@ async function geminiDiscovery(
         config: { temperature: 0.1 },
       });
       let raw = (result.text ?? "").trim().replace(/^```(?:json)?\s*/m, "").replace(/\s*```$/m, "").trim();
-      const parsed = JSON.parse(raw) as { masterChapters?: TocEntry[]; authorPersona?: string; powerWords?: string[] };
+      const parsed = JSON.parse(raw) as { masterChapters?: TocEntry[]; authorPersona?: string; powerWords?: string[]; bookTitle?: string };
       const masterChapters = (parsed.masterChapters ?? [])
         .filter((e) => typeof e.num === "number" && typeof e.title === "string")
         .filter(PART_FILTER)
@@ -203,12 +203,13 @@ async function geminiDiscovery(
         masterChapters,
         authorPersona: parsed.authorPersona ?? "",
         powerWords: Array.isArray(parsed.powerWords) ? parsed.powerWords : [],
+        bookTitle: typeof parsed.bookTitle === "string" ? parsed.bookTitle.trim() : "",
       };
     } catch (e) {
       console.error(`[Discovery] Layer 3 attempt ${attempt} failed:`, e);
     }
   }
-  return { masterChapters: [], authorPersona: "", powerWords: [] };
+  return { masterChapters: [], authorPersona: "", powerWords: [], bookTitle: "" };
 }
 
 async function geminiPersonaOnly(
@@ -237,13 +238,13 @@ async function runDiscovery(
   ai: GoogleGenAI,
   fullText: string,
   buffer: ArrayBuffer,
-): Promise<{ masterChapters: TocEntry[]; authorPersona: string; powerWords: string[] }> {
+): Promise<{ masterChapters: TocEntry[]; authorPersona: string; powerWords: string[]; bookTitle: string }> {
   // Layer 1: PDF native outline
   const outlineChapters = await extractNativeOutline(buffer);
   console.log(`[Discovery] Layer 1 (Native Outline): ${outlineChapters.length} chapters`);
   if (outlineChapters.length >= 3) {
     const { authorPersona, powerWords } = await geminiPersonaOnly(ai, fullText);
-    return { masterChapters: outlineChapters, authorPersona, powerWords };
+    return { masterChapters: outlineChapters, authorPersona, powerWords, bookTitle: "" };
   }
 
   // Layer 2: TOC regex
@@ -251,7 +252,7 @@ async function runDiscovery(
   console.log(`[Discovery] Layer 2 (TOC Regex): ${regexChapters.length} chapters`);
   if (regexChapters.length >= 3) {
     const { authorPersona, powerWords } = await geminiPersonaOnly(ai, fullText);
-    return { masterChapters: regexChapters, authorPersona, powerWords };
+    return { masterChapters: regexChapters, authorPersona, powerWords, bookTitle: "" };
   }
 
   // Layer 3: Gemini
@@ -477,6 +478,7 @@ async function extractChapter(
   chapterText: string,
   authorPersona: string,
   powerWords: string[],
+  discoveredTitle = "",
 ): Promise<Record<string, unknown> | null> {
   const result = await ai.models.generateContent({
     model: "gemini-2.5-pro",
@@ -512,7 +514,13 @@ async function extractChapter(
 
   console.log(`[extractChapter] Ch ${chapter.num} "${chapter.title}" — passed all guards, emitting node`);
 
-  const bookTitle = typeof parsed.bookTitle === "string" ? parsed.bookTitle : "unknown";
+  const rawBookTitle = typeof parsed.bookTitle === "string" ? parsed.bookTitle.trim() : "";
+  const isPlaceholder = !rawBookTitle ||
+    rawBookTitle.startsWith("[") ||
+    rawBookTitle.toLowerCase().includes("exact title") ||
+    rawBookTitle.toLowerCase().includes("book's title") ||
+    rawBookTitle.toLowerCase() === "unknown";
+  const bookTitle = isPlaceholder ? (discoveredTitle || "Unknown Book") : rawBookTitle;
   const bookSlug = bookTitle
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, "")
@@ -547,7 +555,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
         // Phase 1: Discovery — SOP v11 flattened TOC
-        const { masterChapters, authorPersona, powerWords } =
+        const { masterChapters, authorPersona, powerWords, bookTitle: discoveredTitle } =
           await runDiscovery(ai, fullText, buffer);
 
         send({
@@ -580,7 +588,7 @@ export async function POST(request: NextRequest): Promise<Response> {
           const MAX_ATTEMPTS = 2;
           for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
             try {
-              const node = await extractChapter(ai, chapter, chapterText, authorPersona, powerWords);
+              const node = await extractChapter(ai, chapter, chapterText, authorPersona, powerWords, discoveredTitle);
               if (node) {
                 extractedNums.add(chapter.num);
                 completedCount++;

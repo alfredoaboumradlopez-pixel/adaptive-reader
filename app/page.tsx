@@ -157,9 +157,15 @@ export default function HomePage() {
     try {
       const parsed = JSON.parse(stored) as Partial<GraphPayload>;
       if (Array.isArray(parsed.nodes) && Array.isArray(parsed.links)) {
+        const PLACEHOLDER_TITLES = ["[the book's exact title as printed in the text]", "unknown book", "unknown"];
         const nodes = (parsed.nodes as EmpireNode[])
           .map(mergeNodeDefaults)
           .filter((node) => {
+            // Drop nodes with placeholder bookTitle
+            if (!node.bookTitle) return false;
+            const lower = node.bookTitle.toLowerCase().trim();
+            if (lower.startsWith("[")) return false;
+            if (PLACEHOLDER_TITLES.some((p) => lower === p)) return false;
             // Drop nodes where chapter number doesn't match the node's id suffix
             const chapterNum = parseInt((node.chapter ?? "").split(":")[0]);
             const idNum = parseInt((node.id ?? "").split("-").pop() ?? "");
