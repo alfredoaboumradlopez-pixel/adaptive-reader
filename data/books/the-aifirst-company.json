@@ -74,28 +74,24 @@
       "socraticQuestion": "Why does adding a model that generates feedback data change the growth of a data network in a way that simply collecting more data or adding more users never can, and where would that compounding break down?",
       "visual": {
         "type": "cycle",
-        "title": "The Data Learning Effect Loop",
-        "caption": "Next-level data network effects generate their own data, so each turn of the loop compounds.",
+        "title": "Next-Level Data Network Effects",
+        "caption": "A model turns stored data into predictions for customers, whose data flows back into the database, so the loop compounds as customers grow.",
         "items": [
           {
-            "label": "Capture critical mass",
-            "detail": "Economies of scale to data from customers and sensors"
+            "label": "Database",
+            "detail": "Grows as more customers contribute data"
           },
           {
-            "label": "Process into information",
-            "detail": "Data processing capabilities turn facts into decision-ready information"
+            "label": "Model",
+            "detail": "Creates new data from existing data (dy/dx)"
           },
           {
-            "label": "Model makes predictions",
-            "detail": "Data network effect: calculations along edges create new information"
+            "label": "Customer Data",
+            "detail": "Each consumer generates data that feeds the system"
           },
           {
-            "label": "Product gets more useful",
-            "detail": "Better predictions attract more customers and usage"
-          },
-          {
-            "label": "Feedback data flows back",
-            "detail": "Customers generate data simply by using the product"
+            "label": "Data",
+            "detail": "Flows back into the database"
           }
         ]
       },
@@ -127,31 +123,35 @@
       "authorQuote": "Accuracy is performance for AI-First products, and predictions are the product.",
       "keyMechanism": "Lean AI → building a small but complete AI for one specific problem, with model features as milestones and the prediction usability threshold (PUT) replacing the MVP",
       "socraticQuestion": "If a lean start-up measures progress by product usage, why does Lean AI measure it by accuracy against a customer-specific prediction usability threshold, and what would go wrong if you sold an AI product at its 'MVP' instead of its PUT?",
-      "visualAfterSprint": 1,
+      "visualAfterSprint": 3,
       "visual": {
-        "type": "compare",
-        "title": "Lean Start-up vs Lean AI",
-        "caption": "Lean AI keeps the lean loop but swaps every product milestone for a prediction milestone.",
-        "columns": [
+        "type": "stack",
+        "title": "The Lean-AI Stack",
+        "caption": "Lean AI builds from a broad base of data up to a thin interface, capturing just enough at each layer to convince the customer to take the next step.",
+        "items": [
           {
-            "label": "Lean Start-up",
-            "points": [
-              "Minimum viable product",
-              "Product features, judged performant",
-              "Output a calculation",
-              "Qualitative feedback, measure usage",
-              "Launch a company"
-            ]
+            "label": "Build an Interface",
+            "detail": "Package the model into something that convinces customers"
           },
           {
-            "label": "Lean AI",
-            "points": [
-              "Prediction usability threshold (PUT)",
-              "Model features, judged predictive",
-              "Output a prediction",
-              "Quantitative feedback, measure accuracy",
-              "Launch an AI-First product"
-            ]
+            "label": "Show Results",
+            "detail": "Present predictions to contained groups of stakeholders"
+          },
+          {
+            "label": "Get Feedback",
+            "detail": "Capture feedback and measure ROI"
+          },
+          {
+            "label": "Test",
+            "detail": "Test the model in real life"
+          },
+          {
+            "label": "Train Model",
+            "detail": "Train the model on that data"
+          },
+          {
+            "label": "Get Data",
+            "detail": "Capture just enough data to train the model"
           }
         ]
       },
@@ -259,7 +259,7 @@
               "Deliver numbers, graphs, models or discussions",
               "Choose their own tools per job",
               "Need regular meetings to refine questions",
-              "High compute needs, bigger budgets, tighter controls"
+              "Medium computing power, bigger budgets, tighter controls"
             ]
           }
         ]
@@ -346,32 +346,40 @@
       "socraticQuestion": "Why can't an AI-First company manage its models the way a software company manages code releases, and what would go wrong if it tried?",
       "visual": {
         "type": "cycle",
-        "title": "The ML Management Loop",
-        "caption": "Each pass feeds real-world observations and errors back into the next version of the model.",
+        "title": "The Machine Learning Management Loop",
+        "caption": "Models move from training through serving and live inference, and any error detected in monitoring is labeled and fixed before the next round of training.",
         "items": [
           {
-            "label": "Train",
-            "detail": "Split training, test and holdout sets"
+            "label": "Training",
+            "detail": "Split data into training, test and holdout sets"
           },
           {
-            "label": "Version",
-            "detail": "Track model code first, data later"
+            "label": "Evaluation",
+            "detail": "Measure the trained model, covered in Measuring the Loop"
           },
           {
-            "label": "Deploy",
-            "detail": "Serve predictions in the form customers prefer"
+            "label": "Versioning",
+            "detail": "Model code, data values, data schema, software code"
           },
           {
-            "label": "Test",
-            "detail": "Rule scripts, ground truth, and common sense"
+            "label": "Deployment and Serving",
+            "detail": "From reports and dashboards to APIs and augmentations"
           },
           {
-            "label": "Monitor",
-            "detail": "Watch accuracy, drift, bias, and data quality"
+            "label": "Testing",
+            "detail": "Rule-based scripts, ground truth, and manual checks"
           },
           {
-            "label": "Rework",
-            "detail": "Retrain, refit, reweight, redo, then redeploy"
+            "label": "Inference and Monitoring",
+            "detail": "Watch concept, data and distribution for drift"
+          },
+          {
+            "label": "Error?",
+            "detail": "No: keep inferring. Yes: send to labeling"
+          },
+          {
+            "label": "Labeling and Fixing",
+            "detail": "Do nothing, add data, retrain, refit, reweight or redo"
           }
         ]
       },
@@ -390,7 +398,7 @@
         "Picture an AI-First product warning a supermarket stocker that the pasta shelf will be bare within fifteen minutes. He checks after lunch, finds it empty, logs a note in his app and restocks. Meanwhile a camera pointed at the shelf has recorded pasta, then no pasta, then pasta again. The model takes in both the footage and the stocker's note, learns its prediction was right, and grows confident enough to raise the alert hours earlier next time. One small cycle of predict, act and observe has quietly made the system better.",
         "Fontana adds motion to his definition of data learning effects: once inputs, processing and the data network effect are in place, the whole thing starts looping. Each run turns data and models into a prediction, people act on it in the real world, and their observable actions become fresh data for the next run. He contrasts this with a moat, which may change shape yet never deepens by itself, while a loop keeps everything it generates and expands in area, and that area is the competitive advantage. A good loop has ample inputs and lets people do many things with a prediction, raising entropy until the model digests the feedback. Of the three kinds of data a system touches, only feedback data, born from what customers observe after acting on a prediction, keeps feeding the loop and stays truly proprietary.",
         "To choose where a loop can start, Fontana weighs the shape of the payoff. Convex cases such as a Google search, AI marketing leads, sales prioritization or computer-vision stock checks cost little when wrong and pay well when right, whereas a scheduling bot that double books an important meeting or a support bot that angers a customer makes losses loom larger than gains, and a one-off diagnosis has to be perfect. He then turns to profit, walking through a unit priced at $0.10 that leaves a $0.03 contribution margin and a 20 percent gross margin after labor, QA and services costs. Labeling costs fall by shifting work from experts to nonexperts once their agreement rate is high, or toward active learning and synthetic data, and research spending should be run as experiments, like retraining a cereal-box recognizer on dim, oddly angled photos to chase 98 percent accuracy.",
-        "Every piece of the chapter points at the same choice: which prediction problem to hand a loop in the first place. Fontana's checklist asks how much is lost if a decision goes wrong, whether a new entrant could reach the prediction usability threshold quickly, whether returns to data flatten out, and whether fresh data exists to stop the model from drifting. Bayesian methods that learn from small datasets can let newcomers leapfrog, and a model that stops improving signals it is time to gather data for adjacent problems. Accuracy, ROC curves, precision and recall, loss and manual acceptance by experts like dermatologists tell you whether the models are working, while usage around feedback points reveals your power teachers. He has watched AI-First companies stumble when the goals they chased did not feed the core DLE, and that observation hangs over every number he asks you to track."
+        "Every piece of the chapter points at the same choice: which prediction problem to hand a loop in the first place. Fontana's checklist asks how much is lost if a decision goes wrong, how quickly a new entrant could reach sufficient scale of data, whether returns to data flatten out, and whether fresh data exists to stop the model from drifting. Bayesian methods that learn from small datasets can let newcomers leapfrog, and a model that stops improving signals it is time to gather data for adjacent problems. Accuracy, ROC curves, precision and recall, loss and manual acceptance by experts like dermatologists tell you whether the models are working, while usage around feedback points reveals your power teachers. He has watched AI-First companies stumble when the goals they chased did not feed the core DLE, and that observation hangs over every number he asks you to track."
       ],
       "tags": [
         "Metrics",
@@ -404,33 +412,33 @@
       "keyMechanism": "Data Learning Loop → the endogenous, continuous generation of proprietary feedback data as people act on predictions, which trains the next, more accurate prediction and enlarges the loop's area of competitive advantage",
       "socraticQuestion": "Why could a highly accurate model still fail to give a company a lasting advantage, and how would payoff shape, returns to scale of data and drift together tell you whether its loop will keep growing?",
       "visual": {
-        "type": "cycle",
-        "title": "The Data Learning Loop",
-        "caption": "Each run turns a prediction into an observed real-world effect that becomes new proprietary data.",
-        "items": [
+        "type": "matrix",
+        "title": "Returns to Scale vs Drift",
+        "caption": "How defensible a prediction problem is depends on whether more data keeps helping and how fast the world shifts under the model.",
+        "axes": {
+          "x": "Potential for drift: high → low",
+          "y": "Returns to scale of data: low → high"
+        },
+        "quadrants": [
           {
-            "label": "Data meets models",
-            "detail": "Data reacts with models to generate a prediction"
+            "label": "High up-front investment",
+            "detail": "High returns to scale of data, high potential for drift"
           },
           {
-            "label": "People act",
-            "detail": "Humans weigh the prediction, then act on it in the real world"
+            "label": "Defensible",
+            "detail": "High returns to scale, low drift: acquire data faster than competitors"
           },
           {
-            "label": "Real-world effect",
-            "detail": "The action changes something, like a restocked pasta shelf"
+            "label": "Not defensible",
+            "detail": "Low returns to scale, high drift: new entrants leapfrog earlier entrants"
           },
           {
-            "label": "Observation",
-            "detail": "Sensors and app feedback capture what actually happened"
-          },
-          {
-            "label": "Model learns",
-            "detail": "Feedback data updates the model for a better next prediction"
+            "label": "Need to acquire data fast",
+            "detail": "Low returns to scale of data, low potential for drift"
           }
         ]
       },
-      "visualAfterSprint": 1,
+      "visualAfterSprint": 3,
       "color": "#EF4444",
       "sprintCount": 4,
       "lifeExample": "Mide si el loop está creciendo: ¿cada semana hay más datos de retroalimentación?, ¿baja el error?, ¿cuánto cuesta cada predicción? Si el negocio cambia muy rápido (mucho drift), la ventaja no se acumula."
@@ -460,32 +468,63 @@
       "socraticQuestion": "Why would taking on the risk that the AI works, by pricing on ROI or underwriting outcomes, strengthen rather than endanger an AI-First company's competitive position, and what must already be true of its DLE for that bet to pay?",
       "visual": {
         "type": "stack",
-        "title": "Vertical Integration Pyramid",
-        "caption": "Each layer climbed captures more feedback data and more gross margin for the vendor.",
+        "title": "Vertical Integration for AI-First Companies",
+        "caption": "The book's pyramid runs from financing at the base to customer use at the tip, and each layer an AI-First company owns adds data and margin.",
         "items": [
           {
-            "label": "Services and people",
-            "detail": "Staff handle exceptions and act on predictions with customers"
+            "label": "Use",
+            "detail": "Usage data flows back to retrain the models"
           },
           {
-            "label": "Proprietary software",
-            "detail": "Interfaces like a CRM or ticket logger deliver predictions"
+            "label": "Maintenance"
           },
           {
-            "label": "Predictive models",
-            "detail": "Own models trained on proprietary, labeled data"
+            "label": "Training",
+            "detail": "Teach customers how to use the interface"
           },
           {
-            "label": "Data and labeling",
-            "detail": "Collect, prepare and label customer data in-house"
+            "label": "Implementation",
+            "detail": "Hire people to handle exceptions and act on predictions"
           },
           {
-            "label": "Infrastructure",
-            "detail": "Own computing, data and monitoring systems"
+            "label": "Product",
+            "detail": "Proprietary software, like a CRM or ticket logger, delivers predictions"
+          },
+          {
+            "label": "AI Interface"
+          },
+          {
+            "label": "Monitoring",
+            "detail": "Alexa used Amazon's own monitoring systems"
+          },
+          {
+            "label": "Model Building",
+            "detail": "Build your own models, like Alexa's voice recognition"
+          },
+          {
+            "label": "Data Labeling",
+            "detail": "Hire your own people to label data"
+          },
+          {
+            "label": "Data Preparation",
+            "detail": "Prepare data internally, partly for privacy reasons"
+          },
+          {
+            "label": "Data Integration"
+          },
+          {
+            "label": "Data Collection",
+            "detail": "Collect from early users and ancillary datasets"
+          },
+          {
+            "label": "Data Infrastructure"
+          },
+          {
+            "label": "Computing Infrastructure"
           },
           {
             "label": "Financing",
-            "detail": "Own balance sheet guarantees results when the model breaks"
+            "detail": "Guarantee the AI works by covering the cost when it breaks"
           }
         ]
       },
@@ -513,7 +552,7 @@
       "masteryStatus": "Red",
       "level": 2,
       "authorQuote": "AI-First companies put AI first.",
-      "keyMechanism": "Personal Data Learning Effect → fresh input from the book's frameworks, processed in your day job, and multiplied by adding nodes through communities",
+      "keyMechanism": "Data Learning Effects, applied to your own learning → the book’s frameworks as fresh data, processed as you use them at work, with more nodes added by joining communities",
       "socraticQuestion": "If a data learning effect needs fresh data, processing capability and a network, which of the three is weakest in your own learning about AI, and how would strengthening it change what you can bring to your company?",
       "visual": {
         "type": "cycle",

@@ -42,7 +42,8 @@ function Flow({ items }: { items: VisualItem[] }) {
 
 function Cycle({ items }: { items: VisualItem[] }) {
   const n = items.length;
-  const R = 38; // % radius of the ring
+  const dense = n > 6; // many steps: narrower boxes so neighbours don't overlap
+  const R = dense ? 40 : 38; // % radius of the ring
   return (
     <div>
       <div className="relative mx-auto aspect-square w-full max-w-[340px]">
@@ -80,7 +81,9 @@ function Cycle({ items }: { items: VisualItem[] }) {
           return (
             <div
               key={i}
-              className="absolute flex w-[34%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl border border-line-2 bg-card px-2 py-1.5 text-center text-[11px] font-semibold leading-tight text-ink shadow-sm sm:text-xs"
+              className={`absolute flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl border border-line-2 bg-card text-center font-semibold leading-tight text-ink shadow-sm ${
+                dense ? "w-[27%] px-1 py-1 text-[10px] sm:text-[11px]" : "w-[34%] px-2 py-1.5 text-[11px] sm:text-xs"
+              }`}
               style={{ left: `${left}%`, top: `${top}%` }}
             >
               <span>
