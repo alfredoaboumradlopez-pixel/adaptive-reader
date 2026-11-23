@@ -1,0 +1,9 @@
+Untitled
+tsconfig.tsbuildinfo
+.claude/
+.next/
+node_modules/
+.env*
+vite.config.ts
+index.html
+src/

@@ -483,7 +483,7 @@ async function extractChapter(
   const result = await ai.models.generateContent({
     model: "gemini-2.5-pro",
     contents: `${buildChapterPrompt(chapter, authorPersona, powerWords)}\n\nCHAPTER TEXT:\n${chapterText}`,
-    config: { temperature: 0.2, timeout: 120_000 },
+    config: { temperature: 0.2, httpOptions: { timeout: 120_000 } },
   });
 
   let raw = (result.text ?? "").trim();

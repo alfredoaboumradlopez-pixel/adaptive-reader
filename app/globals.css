@@ -1,18 +1,70 @@
 @import "tailwindcss";
 
+/* B · Paper — design tokens (approved direction) */
+@theme inline {
+  --color-paper: #f6f5f1;
+  --color-paper-2: #fbfaf7;
+  --color-card: #ffffff;
+  --color-ink: #17181c;
+  --color-ink-2: #3a3d44;
+  --color-muted: #5c5f66;
+  --color-line: #e4e1d9;
+  --color-line-2: #d4d1c8;
+  --color-chip: #eae7df;
+  --color-accent: #2f5bea;
+  --color-accent-ink: #2448c9;
+  --color-mark: #dce5ff;
+  --color-ok: #1f7a55;
+  --color-ok-ink: #1f6b4a;
+  --color-ok-line: #a9d3bf;
+  --color-warn: #b7791f;
+  --color-warn-ink: #8a5a0b;
+  --color-warn-line: #e3cfa0;
+  --color-bad: #c0392b;
+  --color-bad-ink: #a12c2c;
+  --color-bad-line: #e2b8b8;
+  --font-serif: var(--font-literata), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+}
+
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html,
 body {
   margin: 0;
   width: 100%;
-  height: 100%;
-  background: #030712;
+  min-height: 100%;
+  background: #f6f5f1;
+  color: #17181c;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 12px 2px rgba(251, 191, 36, 0.25); }
-  50%       { box-shadow: 0 0 28px 6px rgba(251, 191, 36, 0.50); }
+body {
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  font-family: var(--font-sans);
+}
+
+button,
+a,
+input,
+textarea,
+label {
+  touch-action: manipulation;
+}
+
+::selection {
+  background: #c7d5ff;
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

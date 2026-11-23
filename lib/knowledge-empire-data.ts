@@ -1,5 +1,21 @@
 export type MasteryStatus = "Red" | "Yellow" | "Green";
 
+export type Depth = "simple" | "detailed" | "deep";
+
+export type VisualItem = { label: string; detail?: string };
+
+export type ChapterVisual =
+  | { type: "flow" | "cycle" | "stack"; title: string; caption?: string; items: VisualItem[] }
+  | { type: "compare"; title: string; caption?: string; columns: { label: string; points: string[] }[] }
+  | {
+      type: "matrix";
+      title: string;
+      caption?: string;
+      axes: { x: string; y: string };
+      /** top-left, top-right, bottom-left, bottom-right */
+      quadrants: VisualItem[];
+    };
+
 export type EmpireNode = {
   id: string;
   bookTitle: string;
@@ -15,6 +31,13 @@ export type EmpireNode = {
   authorQuote?: string | null;
   keyMechanism?: string | null;
   socraticQuestion?: string | null;
+  visual?: ChapterVisual | null;
+  /** 0-based sprint index after which the visual is shown (default 1). */
+  visualAfterSprint?: number;
+  /** Curated, Spanish, real-life application example (Mi vida). */
+  lifeExample?: string | null;
+  /** True when the node comes from the curated library in /data/books. */
+  fromRepo?: boolean;
 };
 
 export type EmpireLink = {

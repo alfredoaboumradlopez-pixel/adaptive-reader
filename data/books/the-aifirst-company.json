@@ -1,0 +1,599 @@
+{
+  "bookTitle": "The AI-First Company",
+  "author": "Ash Fontana",
+  "nodes": [
+    {
+      "id": "the-aifirst-company-0",
+      "bookTitle": "The AI-First Company",
+      "chapter": "0: Introduction",
+      "supportingContext": "Charles Babbage, who arguably invented the first mechanical computer, described humans as tool-making animals. Every wave of tools since the Stone Age spear has pushed past a different human limit, and a third wave is now arriving that leverages something no earlier tool could reach.",
+      "goldenThread": "AI is the third wave of tools, giving us decision-making leverage, so the companies that put it first turn information into the resource that lets them learn faster than the competition.",
+      "narrativeSprints": [
+        "Picture a loom stitching fabric with rows of little levers, moving faster than any hand could weave. That is the first wave of tools: physical leverage, the same family as rope traps and spears. In the second wave, a computer converts a drawing into a pattern the loom follows automatically, giving informational leverage. In the third wave, software scans photos people post on social media, spots what consumers are starting to like, sketches new styles and feeds them to the loom. The clothes arrive in stores right as the trend peaks, which Fontana calls temporal leverage.",
+        "Fontana defines intelligence as learning fast, and he sees AI as a way to speed up that learning by gathering data, processing it into information and spreading it across networks. Earlier tools were capped either by our physical strength or by how much we could know about the future. AI adds decision-making leverage, a new kind of intelligence that improves as we watch its decisions play out. For a business, this means the scarce resource shifts: land, labor and capital defined the last millennium, and information defines this one. An AI-First company is one that builds that capability to gather, process and communicate information to where it is needed, when it is needed.",
+        "The groundwork took decades. Warren McCulloch and Walter Pitts, a teenage prodigy who had mailed corrections to Bertrand Russell, produced the threshold logic unit, a mathematical model of a neuron. Dartmouth coined the term artificial intelligence in 1956, Alan Turing proposed a conversational test of intelligence, and government funding dried up in the seventies after the field overpromised. Breakthroughs in the nineties, a self-driving car, a chess program beating a world champion and a robot pet, stayed locked inside giants like IBM, Sony and the military. Then Yoshua Bengio and Geoffrey Hinton advanced neural networks, graphics chips made them trainable in days, and cheap cloud computing plus a flood of phone and Internet data made AI practical. Fontana joined Zetta Venture Partners, the first fund focused entirely on AI, in 2013, the year a zettabyte of data first crossed the Internet.",
+        "Fontana frames the period from 1950 to 2050 as the AI-First Century, with the first half spent getting AI to work in the lab and the second half spent getting it to work for business and society. By that clock, you are joining around the midpoint, and modern methods let you work with small data, generate synthetic data, label efficiently and build models automatically. AI-First companies are the ones willing to accept short-term trade-offs, within real budgets, in order to build intelligence that pays off over the long run. His eight-part framework moves from strategy through tactics, capital and metrics to a final act about aggregating advantages. It starts with a new kind of competitive advantage he believes compounds faster than any before it, and he calls it the data learning effect."
+      ],
+      "tags": [
+        "AI History",
+        "Strategy",
+        "Leverage",
+        "Information"
+      ],
+      "masteryStatus": "Red",
+      "level": 0,
+      "authorQuote": "This—learning fast—is the definition of intelligence.",
+      "keyMechanism": "Decision-Making Leverage → the third wave of tools, where AI gathers, processes and communicates information so that decisions improve as we learn from their outcomes",
+      "socraticQuestion": "If physical tools were limited by our intellect and computing tools were limited by what we could know about the future, what new limit might an AI-First company run into, and why would information rather than capital be the resource it must manage?",
+      "visual": {
+        "type": "flow",
+        "title": "Three Waves of Tools",
+        "caption": "Each wave of tools pushed past the limit the previous wave left behind.",
+        "items": [
+          {
+            "label": "Physical leverage",
+            "detail": "Spears, rope traps, industrial machines extend our physical reach"
+          },
+          {
+            "label": "Intellectual leverage",
+            "detail": "Printing press and computers move and compute information"
+          },
+          {
+            "label": "Decision-making leverage",
+            "detail": "AI gathers, processes and communicates information for better decisions"
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "color": "#EF4444",
+      "sprintCount": 4,
+      "lifeExample": "En un restaurante, hoy las decisiones de compra, turnos y menú viven en la cabeza del gerente. El primer paso AI-First es registrar cada decisión y su resultado para que el negocio aprenda de ellas, no solo la persona."
+    },
+    {
+      "id": "the-aifirst-company-1",
+      "bookTitle": "The AI-First Company",
+      "chapter": "1: Defining Data Learning Effects",
+      "supportingContext": "On a production line, a dashboard tells you that plastic bottle tops warp every time the extrusion machine runs hotter than 250°C. You cap the temperature, and the defect rate may fall, or you may get pulled onto another project and never learn whether the fix worked.",
+      "goldenThread": "A data learning effect is the automatic compounding of information: once a critical mass of data is processed and fed into a model that generates its own feedback data, the advantage grows faster than any scale, learning or network effect.",
+      "narrativeSprints": [
+        "You check a dashboard of defects in plastic bottle tops, compare it with what you saw in the defect bin, and notice the tops warp whenever the temperature passes 250°C. So you set a limit on the extrusion machine and move on. Everything you learned lived inside one brain, and nothing captures whether the change actually helped. Now imagine a system that nudges the temperature by 1°C across several production lines at once, measures defects from images of the lids, and settles on the best temperature by itself. That system pools sensors, lines and computations, then decides which experiment to run next.",
+        "Fontana calls the advantage behind that second system a data learning effect: the automatic compounding of information. His formula is data learning effects = economies of scale to data + data processing capabilities + data network effects. In plain terms, gather a lot of data, turn it into something useful for a decision, and build a system that keeps producing more useful data. Data alone is just facts, and it becomes information only when it resolves uncertainty for someone. Entry-level data network effects grow when outsiders add data, like another review on a product page, while next-level data network effects add a model that creates new data from existing data, so the network multiplies itself.",
+        "Amazon shows one flywheel kicking off another. It first won by packing listings with structured product data and comparison tables, then built A9, a team that matched product data with purchase data to power machine-learned search and recommendations. Square Capital improves in the foreground: a merchant adds point-of-sale data and almost instantly sees a loan offer priced by comparison with past borrowers. Cloudflare improves in the background, learning which requests were bad for other customers to flag denial-of-service attacks you never see coming. Credit scores are entry level, and a lender with ongoing access to your spending that predicts repayment is next level, with feedback data and a predictive model making the difference.",
+        "These effects bring real powers, including markets that tip to one winner, cost leadership as customers take on data costs, and smarter pricing like the airlines' yield management systems. They also hit walls, such as regulators, storage and cleaning costs that can make extra data cost more than it is worth, and the three hundredth coffee shop review nobody reads. Fontana admits that in his experience these effects do not catch fire the way social networks do, with one user pulling in the next. They can take years of hard work gathering and processing data, led by people who know where the relevant data sits. When the loop finally starts feeding itself, though, the company is learning about its customers' businesses in a way the old formulas for competing cannot describe."
+      ],
+      "tags": [
+        "Data",
+        "Moats",
+        "Network Effects",
+        "Strategy"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "Data network effects start only after working hard to gather and process data.",
+      "keyMechanism": "Data Learning Effects → economies of scale to data + data processing capabilities + data network effects, the automatic compounding of information",
+      "socraticQuestion": "Why does adding a model that generates feedback data change the growth of a data network in a way that simply collecting more data or adding more users never can, and where would that compounding break down?",
+      "visual": {
+        "type": "cycle",
+        "title": "The Data Learning Effect Loop",
+        "caption": "Next-level data network effects generate their own data, so each turn of the loop compounds.",
+        "items": [
+          {
+            "label": "Capture critical mass",
+            "detail": "Economies of scale to data from customers and sensors"
+          },
+          {
+            "label": "Process into information",
+            "detail": "Data processing capabilities turn facts into decision-ready information"
+          },
+          {
+            "label": "Model makes predictions",
+            "detail": "Data network effect: calculations along edges create new information"
+          },
+          {
+            "label": "Product gets more useful",
+            "detail": "Better predictions attract more customers and usage"
+          },
+          {
+            "label": "Feedback data flows back",
+            "detail": "Customers generate data simply by using the product"
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "color": "#EF4444",
+      "sprintCount": 4,
+      "lifeExample": "Cada ticket, merma y reservación es un dato que hoy se pierde. Si los juntas y los usas para predecir algo (por ejemplo, cuánto preparar), cada predicción que corriges genera más datos y la siguiente sale mejor: ese es el loop."
+    },
+    {
+      "id": "the-aifirst-company-2",
+      "bookTitle": "The AI-First Company",
+      "chapter": "2: Lean AI",
+      "supportingContext": "Fontana opens with a famous line credited to Henry Ford: asked what they wanted, people would have said faster horses. The tools he reaches for first are a histogram, a scatter chart, and one question from one customer.",
+      "goldenThread": "The quickest path to an AI-First product is a lean loop of one question, one dataset and one statistical method, pushed until the predictions cross that customer's prediction usability threshold, rather than a big machine learning build.",
+      "narrativeSprints": [
+        "Picture a customer with one pressing question and one database that probably holds the answer. Instead of assembling a machine learning team, you assign a single data scientist to act almost like a consultant, pull that one dataset onto a laptop, and plot it on a histogram or scatter chart to get a feel for what is going on. There is no cloud pipeline, no labeling project and no interface, just a printed report carrying one answer. This deliberately small setup is your opening move toward an AI-First company, not a detour from it.",
+        "Lean AI is the process of building a small but complete AI that solves one specific problem, and it borrows the shape of the lean start-up while swapping out its milestones. Where a start-up chases a minimum viable product, you chase the prediction usability threshold, or PUT: the point at which a prediction becomes useful to a particular customer. Product features give way to model features, judged as predictive rather than performant, and the output becomes a prediction instead of a calculation. Feedback turns quantitative, asking whether the prediction was accurate enough, and the loop runs from generating a prediction to showing a report, collecting more data and retraining the model. In this vocabulary, accuracy takes the place that performance used to hold.",
+        "The data-science-first instinct has support from Kaggle, where ensembles of decision trees such as random forests and gradient boosted trees, combined with hand-built features, win most competitions on structured data, and neural networks win most on unstructured data. The payoff is framed in Pareto terms: roughly 80 percent of the optimal result for 20 percent of the work. The same ratio runs through the proof-of-concept advice, since about 80 percent of AI-building time goes to preparing data, and reaching 80 percent accuracy may take only a fifth of the timeline while the last stretch consumes the rest. A good POC therefore pins down seven things up front: an accuracy benchmark, a business goal, data, dependencies, team, timeline and cost. Even the sample benchmark stays grounded, pointing to pothole-detecting sensors as workable at a time when fully autonomous vehicles are not.",
+        "There is a long list of things you are told to hold off on: extensive labeling, harvesting from several sources, sensitive data, a separate data store, a data platform or data lake. Each of these is real work that customers will eventually need, and each is deliberately postponed. Starting with one question, one stakeholder and one algorithm also builds trust, keeps privacy problems at bay, and makes the why behind a prediction easier to explain to people new to AI. Like sampling a single bite before committing to a whole pie, the lean path lets you and your customer discover what a feature-complete product must deliver before expectations, modeling difficulty and data needs all climb together."
+      ],
+      "tags": [
+        "Lean AI",
+        "Strategy",
+        "Metrics",
+        "Data Science"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "Accuracy is performance for AI-First products, and predictions are the product.",
+      "keyMechanism": "Lean AI → building a small but complete AI for one specific problem, with model features as milestones and the prediction usability threshold (PUT) replacing the MVP",
+      "socraticQuestion": "If a lean start-up measures progress by product usage, why does Lean AI measure it by accuracy against a customer-specific prediction usability threshold, and what would go wrong if you sold an AI product at its 'MVP' instead of its PUT?",
+      "visualAfterSprint": 1,
+      "visual": {
+        "type": "compare",
+        "title": "Lean Start-up vs Lean AI",
+        "caption": "Lean AI keeps the lean loop but swaps every product milestone for a prediction milestone.",
+        "columns": [
+          {
+            "label": "Lean Start-up",
+            "points": [
+              "Minimum viable product",
+              "Product features, judged performant",
+              "Output a calculation",
+              "Qualitative feedback, measure usage",
+              "Launch a company"
+            ]
+          },
+          {
+            "label": "Lean AI",
+            "points": [
+              "Prediction usability threshold (PUT)",
+              "Model features, judged predictive",
+              "Output a prediction",
+              "Quantitative feedback, measure accuracy",
+              "Launch an AI-First product"
+            ]
+          }
+        ]
+      },
+      "color": "#EF4444",
+      "sprintCount": 4,
+      "lifeExample": "Antes de comprar un sistema de pronósticos, toma solo las ventas de los últimos 3 meses y responde una pregunta: ¿cuántos cubiertos tendremos el viernes? Define qué tan exacta debe ser la respuesta para que el gerente la use."
+    },
+    {
+      "id": "the-aifirst-company-3",
+      "bookTitle": "The AI-First Company",
+      "chapter": "3: Getting the Data",
+      "supportingContext": "Some valuable data sits in a local council office as paper files that must be photocopied and run through optical character recognition before a computer can read them. Elsewhere, a Bloomberg terminal leases for thousands of dollars a month, even as the machine itself is built from commodity parts.",
+      "goldenThread": "Data is worth acquiring in proportion to how hard it is for others to get and how useful it is for your predictions, so the winning move is to string together whatever sources you can into a proprietary dataset and feed it into a DLE rather than sell it.",
+      "narrativeSprints": [
+        "Imagine a car insurance claim as it works today: an assessor visits a damaged vehicle at the body shop, takes photos, writes a report, and sends it to a loss adjuster who decides whether to repair or replace the car and for how much. If the customer disputes the verdict, the whole round repeats, all on pen, paper, clipboards, faxes and cameras. Put that sequence into a single workflow app and every photo, cost and decision lands in a database. That record of which damage gets fixed, what repairs cost and how cars are valued is exactly the hard-to-gather data from which an intelligent system can later predict the next step and fill in parts of the form itself.",
+        "Since AI-First companies earn their return from data, the first step toward a data learning effect is knowing what a dataset is worth before you spend capital on it. Discrimination asks whether the data was hard for others to get, judged on accessibility, availability, cost, time and fungibility. Determination asks whether it is useful for your decision, judged on perishability, veracity, dimensionality (the columns), breadth (the rows) and self-reinforcement, where repeated measurements of the same entity raise each other's value. Volume alone settles little, because returns to data are rarely linear: a few hundred labeled images can stand in for a few hundred thousand unlabeled ones, and a hundred Word documents can train a model to spot specific contract clauses.",
+        "The sources are many, and the examples are concrete. Expensify began by pulling bank and card transactions into expense reports, then trained an expense-categorizing AI on that workflow data, and Segment, later bought by Twilio for over three billion dollars, integrated data from apps, servers and cloud tools before building intelligent user profiles on top of it. On the labeling side, the rule of thumb is one manager per fifty to a hundred labelers, label costs range from cents on Mechanical Turk to hundreds of dollars from a doctor, and three labelers who each err 5 percent of the time will share the same mistake only 0.01 percent of the time. Google, Facebook and Amazon gathered consumer data through free or convenient products, Dark Sky turned phone barometers into ultra-local weather predictions, and Nielsen pays households to keep a tracking box on the TV.",
+        "Each source carries its own catch: integrations are easy to copy and eat into margins, outsourced labelers lack specialization, crawled pages and government APIs are open to everyone, and data bought from brokers delivers its value up front and then decays. What turns common material into an advantage is the effort others will not repeat, such as cleaning crawled data, transcribing offline municipal records, or writing contracts that keep rights to anonymized, aggregated data and to global models. Facebook and LinkedIn both cut off API access to their data once they grasped its worth, choosing to sell advertising, sales and recruiting products built on it instead. A proprietary dataset, however painstaking to assemble, is where the compounding only begins."
+      ],
+      "tags": [
+        "Data",
+        "Strategy",
+        "Moats",
+        "Labeling"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "Accruing a proprietary dataset, while painstaking, is a valuable thing to do.",
+      "keyMechanism": "Data valuation → score data on Discrimination (how hard it is for others to get) and Determination (how useful it is to your prediction) before acquiring it to start a DLE",
+      "socraticQuestion": "Why do crawled web pages and government APIs offer little competitive advantage while transcribed municipal records or a customer data coalition can, and what does that imply about where a data learning effect really starts?",
+      "visualAfterSprint": 1,
+      "visual": {
+        "type": "compare",
+        "title": "Valuing Data Before Acquiring",
+        "caption": "Weigh how hard data is for others to get against how useful it is to you.",
+        "columns": [
+          {
+            "label": "Discrimination: hard to get?",
+            "points": [
+              "Accessibility: physically or legally hard to reach",
+              "Availability: slow rate limits on pulling data",
+              "Cost: vendor price or required data contribution",
+              "Time: must be collected over a long period",
+              "Fungibility: cannot be swapped for cheaper data"
+            ]
+          },
+          {
+            "label": "Determination: is it useful?",
+            "points": [
+              "Perishability: how fast it stops reflecting reality",
+              "Veracity: reliable enough to base decisions on",
+              "Dimensionality: number of attributes, or columns",
+              "Breadth: number of entities, or rows",
+              "Self-reinforcement: repeated measures strengthen each other"
+            ]
+          }
+        ]
+      },
+      "color": "#EF4444",
+      "sprintCount": 4,
+      "lifeExample": "Pregúntate qué datos tienes que tu competencia no puede conseguir (tus tickets por platillo, tus tiempos de cocina, tus quejas) y cuáles sirven de verdad para predecir algo. Esos son los que vale la pena juntar y limpiar primero."
+    },
+    {
+      "id": "the-aifirst-company-4",
+      "bookTitle": "The AI-First Company",
+      "chapter": "4: AI-First Teams",
+      "supportingContext": "Fontana lists the roles an AI-First company may eventually need, from data analyst to machine learning researcher, each trained in a slightly different discipline than a traditional software engineer. The first hire in his recommended sequence is not an engineer at all, and he points recruiters toward physics, actuarial science and epidemiology.",
+      "goldenThread": "Becoming AI-First is a sequencing and management problem: hire statisticians before engineers, manage data scientists like researchers chasing questions rather than engineers shipping features, and push that talent out into the business units under a company-wide data strategy.",
+      "narrativeSprints": [
+        "Picture starting with no data science capability at all and a preference for spending small. Fontana's first move is a data analyst, someone who builds dashboards and interprets model outputs, because the business's need for better decisions tells you which prediction projects matter. A data scientist comes next to run experiments that justify further investment, then a data engineer to get and clean the data before anyone builds models. Only after that do the machine learning engineer, data product manager and data infrastructure engineer arrive, with the machine learning researcher hired last to push past off-the-shelf frameworks on edge cases.",
+        "Processing data is the second ingredient of data learning effects, and it requires an AI-First team that a conventional software manager may not know how to run. Engineers are pointed at goals such as releasing a feature and tracked with waterfall charts, whereas data scientists are pointed at questions whose answers nobody knows in advance, so the target keeps moving. Their output may be a spreadsheet, a graph, a model or a conversation, they pick their own tools, and they need regular meetings in place of specifications. Their computing bills can be large, which calls for bigger budgets, ad hoc purchase approvals, executive sponsorship and tighter spending controls. How different the management must be depends on the role, from almost none for a data infrastructure engineer to very different for an ML researcher, who is best led by someone quantitative with experience managing researchers.",
+        "Decoupling data science from software engineering widens the candidate pool to economics, econometrics, accounting, actuarial science, biology, geology, epidemiology, demographics and physics, all fields steeped in mathematics and statistics. Fontana singles out the physicist as someone likely to grasp the fundamentals of data analysis already. Outsourcing suits discrete analytical jobs with clear questions and data in a few databases, and consultants can set up pipelines and infrastructure, while core ML work, data product management and ML research resist it because they demand constant tuning or close customer contact. His tool survey runs from free frameworks like scikit-learn, TensorFlow and PyTorch to collaboration platforms such as Dataiku and Amazon SageMaker that cost hundreds of dollars a month.",
+        "Then comes the question of where these people sit. A centralized team under a chief data officer coordinates infrastructure and lets data scientists and ML engineers attack hard problems together, at the cost of slower data access for everyone else and little knowledge reaching domain experts. A decentralized team inside a business unit gets domain heuristics, real-world data and customer feedback, at the cost of fragmented data, weak IT support and thin executive attention. Fontana notices that the executives he talks to every week who move fastest are the ones who keep fusing the industrial with the technical."
+      ],
+      "tags": [
+        "Teams",
+        "Hiring",
+        "Management",
+        "Organization"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "Position AI talent where they can learn about real-world problems.",
+      "keyMechanism": "AI-First Organization → distributing data science and ML talent across business units, with AIs behind every product and an executive team setting data strategy for the whole company",
+      "socraticQuestion": "Why might a company that hires brilliant ML researchers first and keeps them in a central lab still fail to build data learning effects?",
+      "visual": {
+        "type": "compare",
+        "title": "Managing Engineers vs Data Scientists",
+        "caption": "Data scientists work like researchers, so they need a different kind of manager.",
+        "columns": [
+          {
+            "label": "Software Engineers",
+            "points": [
+              "Managed to goals like releasing features",
+              "Deliver concrete artifacts in code",
+              "Managers set a common toolkit",
+              "Work from specifications",
+              "Normal computing needs on shared resources"
+            ]
+          },
+          {
+            "label": "Data Scientists",
+            "points": [
+              "Managed to ask and answer questions",
+              "Deliver numbers, graphs, models or discussions",
+              "Choose their own tools per job",
+              "Need regular meetings to refine questions",
+              "High compute needs, bigger budgets, tighter controls"
+            ]
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "color": "#EF4444",
+      "sprintCount": 4,
+      "lifeExample": "No contrates un equipo de IA de golpe. Empieza con una persona que sepa de datos y la pones a trabajar con operaciones (cocina, piso, compras) persiguiendo preguntas concretas, no proyectos de software."
+    },
+    {
+      "id": "the-aifirst-company-5",
+      "bookTitle": "The AI-First Company",
+      "chapter": "5: Making the Models",
+      "supportingContext": "To teach a machine to spot left ventricle hypertrophy in an echocardiogram, someone first has to consult a medical expert who knows where the left ventricle is and how thick its wall can grow before the heart falters. Fontana then lines up ten families of methods, from inductive logic programming to reinforcement learning, and asks of each a stranger question than how accurate it is.",
+      "goldenThread": "The strategic value of a machine learning method lies in the data it creates and accumulates as it runs, since the rules, classes, features, weights and observations a model generates about how it learns become a compounding asset that powers data network effects.",
+      "narrativeSprints": [
+        "Fontana starts with the eye: a pupil is a small black circle, so anyone can write a feature that fires on a round cluster of pure black pixels. A heart condition is another matter, since only a cardiologist can say which chamber to examine and what wall thickness signals trouble. Then there is the zebra, which he recognizes instantly yet could never describe by the spacing of its stripes. For cases like that you hand the machine labeled pictures of zebras and non-zebras and let it discover the distinguishing features on its own.",
+        "Building a model begins with framing the problem as an output variable and then engineering features, the potential causes, that map to labels, the outputs. Fontana's ladder for supervised models is simple: use obvious features when they exist, call in a domain expert when they do not, let an algorithm learn them from labeled examples next, and fall back on methods needing neither features nor labels last. More predictive features raise accuracy, at the risk of overfitting the model to its training data. The chapter's real focus is the third ingredient of data learning effects, the edges of the data network, where each method can generate new data and accumulate it over time.",
+        "Inductive logic programming and statistical analysis produce rules and categories, and neither accumulates anything on its own. Decision trees create classes that can be reused in neighboring decisions, and adding recursion lets them produce data faster, while Bayesian and other decision networks infer new weights and parameters on every run. Feed-forward networks emit a prediction and stop, whereas recurrent networks keep generating predictions on each automatic run. Convolutional networks and generative adversarial networks pile up learned features with every pass, the GAN's generator and discriminator sparring until they surface features the designer never imagined, and reinforcement learning agents gather fresh observations each time they act.",
+        "Getting started has never been easier, and Fontana watches companies every day drop data into a basic framework and only later customize the pieces for a customer's problem. Choosing a method depends on what data you hold and what you want to predict, with supervised learning needing training and feedback data and reinforcement learning needing an objective. Once a few models run, the more interesting question is what else they leave behind on each turn of the crank. Some of that residue describes not the world but the learning itself, and it can be carried into problems you have not met yet."
+      ],
+      "tags": [
+        "Models",
+        "Machine Learning",
+        "Network Effects"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "The power of AI is in the information built up over time",
+      "keyMechanism": "Data Network Effects → ML methods that generate new data such as rules, classes, features, predictions and observations as output, and accumulate it with each run of the model",
+      "socraticQuestion": "If two models are equally accurate today, why might one built with a GAN or reinforcement learning be a more valuable company asset than one built as a feed-forward network?",
+      "visual": {
+        "type": "compare",
+        "title": "What Models Leave Behind",
+        "caption": "Some methods only create data once, while others accumulate it with every run.",
+        "columns": [
+          {
+            "label": "Creates, Never Accumulates",
+            "points": [
+              "Inductive logic programming: rules",
+              "Statistical analysis: categories",
+              "Feed-forward networks: predictions"
+            ]
+          },
+          {
+            "label": "Creates and Accumulates",
+            "points": [
+              "Decision trees and networks: classes, weights, parameters",
+              "Evolutionary algorithms: algorithm performance",
+              "Recurrent networks: predictions every run",
+              "CNNs and GANs: learned features",
+              "Reinforcement learning: new observations"
+            ]
+          }
+        ]
+      },
+      "visualAfterSprint": 2,
+      "color": "#EF4444",
+      "sprintCount": 4,
+      "lifeExample": "Elige métodos que dejen algo útil cada vez que corren: por ejemplo, un modelo de demanda que además etiqueta qué días fueron atípicos y por qué. Esas etiquetas se acumulan y valen más que el modelo mismo."
+    },
+    {
+      "id": "the-aifirst-company-6",
+      "bookTitle": "The AI-First Company",
+      "chapter": "6: Managing the Models",
+      "supportingContext": "Media reports regularly describe AIs going crazy, spitting out biased or offensive output and making questionable decisions. Fontana proposes an automated loop meant to let a model keep learning from the real world without breaking, and it starts before deployment with a holdout group that never touches the AI at all.",
+      "goldenThread": "Because AI-First products keep changing as they learn, they must be run as a closed loop that trains, versions, deploys, tests, monitors and reworks models against reality, with customers brought along through deliberate acceptance practices instead of a one-time software launch.",
+      "narrativeSprints": [
+        "Imagine an AI-First CRM company deciding whether to build its own app for salespeople or pipe recommendations into Salesforce through its open API, knowing a closed system like SAP would be harder. Customer data arrives riddled with duplicates, and many customers treat the new product as an excuse to rebuild their entire data infrastructure. Fontana's advice is to pull the minimum data from the fewest tables in a single database, even by hand, instead of disappearing into a yearlong data-lake project. Sensors bring their own headaches, from shipping and wiring to keeping a thermal sensor working in the cold, which is why hardware-specific systems integrators earn their place.",
+        "The ML management loop is an automated system to continuously train, version, deploy, test, monitor and fix models. Training splits data into training, test and holdout sets, and a quarantined holdout group stays on the legacy system so results with and without AI can be compared later. Versioning has to track model code, data values, data schema and software code together, so Fontana advises versioning model code first and data later, with reproducibility as the goal. Testing blends rule-based scripts, ground-truth comparisons and human common sense, monitoring watches for drift, bias and data-quality failures, and rework ranges from doing nothing to redoing the features entirely.",
+        "Fontana's drift examples are concrete. Concept drift is realizing you should predict theft from a customer's porch, not whether a driver arrives before five o'clock, and data drift is discovering that people buy batteries after extreme weather rather than steadily all year, or losing a location feed when a developer cuts off its API. A customer might mention that drivers linger at stops when it rains, prompting you to test weather as a predictive feature of delivery times. A store sensor that fails in the cold can make it look as if shoppers come only on hot days, a case for refitting rather than trusting the data. Bias gets the treatment people give human bias, namely hard constraints on what the model can predict, who sees the predictions and how they are used.",
+        "Acceptance is part technical and part political: augment experts instead of threatening to automate them, value new revenue over savings, set a realistic road map so one proof of concept does not spawn another, and show results fast. Distributing the product broadly, up the management chain and across every business unit, produces more feedback data, which improves the product and wins over more users. Regular retraining lets customers see the model respond to what they feed it, nudging them to feed it more. Fontana admits most companies he sees still build these tools themselves, and he closes by reminding you what you are really constructing beneath all this machinery."
+      ],
+      "tags": [
+        "Models",
+        "Operations",
+        "Implementation",
+        "Monitoring"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "Model management is not code management.",
+      "keyMechanism": "ML Management Loop → an automated system to continuously train, version, deploy, test, monitor, and fix models so they learn from real-world data without breaking",
+      "socraticQuestion": "Why can't an AI-First company manage its models the way a software company manages code releases, and what would go wrong if it tried?",
+      "visual": {
+        "type": "cycle",
+        "title": "The ML Management Loop",
+        "caption": "Each pass feeds real-world observations and errors back into the next version of the model.",
+        "items": [
+          {
+            "label": "Train",
+            "detail": "Split training, test and holdout sets"
+          },
+          {
+            "label": "Version",
+            "detail": "Track model code first, data later"
+          },
+          {
+            "label": "Deploy",
+            "detail": "Serve predictions in the form customers prefer"
+          },
+          {
+            "label": "Test",
+            "detail": "Rule scripts, ground truth, and common sense"
+          },
+          {
+            "label": "Monitor",
+            "detail": "Watch accuracy, drift, bias, and data quality"
+          },
+          {
+            "label": "Rework",
+            "detail": "Retrain, refit, reweight, redo, then redeploy"
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "color": "#EF4444",
+      "sprintCount": 4,
+      "lifeExample": "Un pronóstico que funcionó en marzo puede fallar en diciembre. Revisa cada semana cuánto se equivocó contra la realidad, corrígelo y explícale al equipo por qué cambió, para que siga confiando en él."
+    },
+    {
+      "id": "the-aifirst-company-7",
+      "bookTitle": "The AI-First Company",
+      "chapter": "7: Measuring the Loop",
+      "supportingContext": "A camera in a supermarket aisle watches a shelf of pasta go empty and then fill again after a stocker responds to an AI alert. Fontana treats that small restocking episode as an engine with fuel, chambers and a turning crank, and asks what it would take for such an engine to keep growing on its own.",
+      "goldenThread": "A data learning effect is a loop rather than a static moat, so its area only keeps growing if you pick problems with convex payoffs, enough data, real returns to scale and low drift, and then track the model metrics and unit costs that tell you whether each run of the loop is paying off.",
+      "narrativeSprints": [
+        "Picture an AI-First product warning a supermarket stocker that the pasta shelf will be bare within fifteen minutes. He checks after lunch, finds it empty, logs a note in his app and restocks. Meanwhile a camera pointed at the shelf has recorded pasta, then no pasta, then pasta again. The model takes in both the footage and the stocker's note, learns its prediction was right, and grows confident enough to raise the alert hours earlier next time. One small cycle of predict, act and observe has quietly made the system better.",
+        "Fontana adds motion to his definition of data learning effects: once inputs, processing and the data network effect are in place, the whole thing starts looping. Each run turns data and models into a prediction, people act on it in the real world, and their observable actions become fresh data for the next run. He contrasts this with a moat, which may change shape yet never deepens by itself, while a loop keeps everything it generates and expands in area, and that area is the competitive advantage. A good loop has ample inputs and lets people do many things with a prediction, raising entropy until the model digests the feedback. Of the three kinds of data a system touches, only feedback data, born from what customers observe after acting on a prediction, keeps feeding the loop and stays truly proprietary.",
+        "To choose where a loop can start, Fontana weighs the shape of the payoff. Convex cases such as a Google search, AI marketing leads, sales prioritization or computer-vision stock checks cost little when wrong and pay well when right, whereas a scheduling bot that double books an important meeting or a support bot that angers a customer makes losses loom larger than gains, and a one-off diagnosis has to be perfect. He then turns to profit, walking through a unit priced at $0.10 that leaves a $0.03 contribution margin and a 20 percent gross margin after labor, QA and services costs. Labeling costs fall by shifting work from experts to nonexperts once their agreement rate is high, or toward active learning and synthetic data, and research spending should be run as experiments, like retraining a cereal-box recognizer on dim, oddly angled photos to chase 98 percent accuracy.",
+        "Every piece of the chapter points at the same choice: which prediction problem to hand a loop in the first place. Fontana's checklist asks how much is lost if a decision goes wrong, whether a new entrant could reach the prediction usability threshold quickly, whether returns to data flatten out, and whether fresh data exists to stop the model from drifting. Bayesian methods that learn from small datasets can let newcomers leapfrog, and a model that stops improving signals it is time to gather data for adjacent problems. Accuracy, ROC curves, precision and recall, loss and manual acceptance by experts like dermatologists tell you whether the models are working, while usage around feedback points reveals your power teachers. He has watched AI-First companies stumble when the goals they chased did not feed the core DLE, and that observation hangs over every number he asks you to track."
+      ],
+      "tags": [
+        "Metrics",
+        "Loops",
+        "Unit Economics",
+        "Moats"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "Measuring the right thing causes you to do the right thing.",
+      "keyMechanism": "Data Learning Loop → the endogenous, continuous generation of proprietary feedback data as people act on predictions, which trains the next, more accurate prediction and enlarges the loop's area of competitive advantage",
+      "socraticQuestion": "Why could a highly accurate model still fail to give a company a lasting advantage, and how would payoff shape, returns to scale of data and drift together tell you whether its loop will keep growing?",
+      "visual": {
+        "type": "cycle",
+        "title": "The Data Learning Loop",
+        "caption": "Each run turns a prediction into an observed real-world effect that becomes new proprietary data.",
+        "items": [
+          {
+            "label": "Data meets models",
+            "detail": "Data reacts with models to generate a prediction"
+          },
+          {
+            "label": "People act",
+            "detail": "Humans weigh the prediction, then act on it in the real world"
+          },
+          {
+            "label": "Real-world effect",
+            "detail": "The action changes something, like a restocked pasta shelf"
+          },
+          {
+            "label": "Observation",
+            "detail": "Sensors and app feedback capture what actually happened"
+          },
+          {
+            "label": "Model learns",
+            "detail": "Feedback data updates the model for a better next prediction"
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "color": "#EF4444",
+      "sprintCount": 4,
+      "lifeExample": "Mide si el loop está creciendo: ¿cada semana hay más datos de retroalimentación?, ¿baja el error?, ¿cuánto cuesta cada predicción? Si el negocio cambia muy rápido (mucho drift), la ventaja no se acumula."
+    },
+    {
+      "id": "the-aifirst-company-8",
+      "bookTitle": "The AI-First Company",
+      "chapter": "8: Aggregating Advantages",
+      "supportingContext": "Amazon built Alexa from the ground up, paying for it with its own capital, hiring its own people to label voice snippets and shipping the speaker that sits in your home. Fontana holds that owning every layer of a product like this hands an AI-First company something more valuable than quality control.",
+      "goldenThread": "Once a DLE lowers costs through automation, an AI-First company can stack further advantages on top of it, from vertical integration and ROI-based pricing to disruption, aggregation, standards and first-mover data, each chosen because it pulls in more data that feeds the same loop and lets the company subordinate incumbents.",
+      "narrativeSprints": [
+        "Follow Alexa from the bottom up: Amazon financed it internally, ran it on Amazon Web Services, gathered data from early users and spoken-word datasets, kept that data in-house partly for privacy, paid its own staff to label voice clips and trained its own recognition models. It then built the speaker, shipped it with setup apps, and pulled usage data back over the Internet to retrain the models. Fontana calls this a completely vertically integrated product. For an AI-First company the same idea means doing the whole job, such as answering a customer's support emails outright instead of offering suggested replies to agents. He keeps returning to that support-email example to show what each layer of integration adds.",
+        "The starting point is the cost saving a DLE produces by automating a process. You can keep prices steady and reinvest the extra profit in the technology or in repositioning the business to get more data, or you can cut prices to pursue price discrimination, disruption and aggregation. Fontana maps the old supply and demand vocabulary of advantage onto AI-First firms: privileged data, better processing and scale on one side, and trust-based brands, switching costs and network effects on the other. Vertical integration earns more data, revenue and profit, because watching users accept, edit or reject predictions creates feedback, and taking on the risk that the AI works enables ROI-based pricing. Aggregation flips software integration, so where incumbents integrate backward from a workflow tool into a database, AI-First products integrate forward, pulling data from that database to run an intelligent system people use daily.",
+        "The numbers make the pyramid concrete: a prediction that costs 50 cents to serve through an API at $1 a call earns a 50 percent gross margin, while adding an interface and training for another dollar lets the vendor charge $5 against $1.50 in costs, a 70 percent margin. Software companies typically capture 10 to 30 percent of the return they create, which is the share ROI-based pricing aims for. Google once sold ads for less than website banners and now charges more because personalization yields better leads, illustrating the second of three disruption phases. Netflix, a JIRA ticket-routing app sold through the Atlassian marketplace and apps running inside Salesforce show the zero-cost relationships of aggregators. Standards create lock-in through Microsoft Excel's proprietary format, SAP's supply-chain data protocols, Oracle-trained developers and NVIDIA's CUDA, and Google's early hoard of search and driving data shows why copycats need the data as well as the technique.",
+        "Fontana argues that the usual drawbacks of moving first, such as free riders borrowing your technology or nimbler rivals adapting faster, do not bite when the asset is data and the system keeps adapting to what flows in. Intelligent applications can sit on top of systems of record like Salesforce, capturing the data exhaust that legacy tools never stored and turning it into live predictions. Even hiring becomes a loop, since the best ML people want the best data, and better people produce better models that gather still more data. Yet his closing advice runs against a typical venture pitch: he suggests that buying a low-margin services business and doing the work by hand can be a better opening move than raising money for software. The question he leaves is why someone aiming to capture all the value of automation would begin with no automation at all."
+      ],
+      "tags": [
+        "Strategy",
+        "Pricing",
+        "Vertical Integration",
+        "Moats"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "You don’t start by building technology; you start by building understanding.",
+      "keyMechanism": "Aggregating Advantages → using the cost savings and data of a DLE to layer on vertical integration, data-based pricing, disruption, aggregation and positioning, each of which generates more data to grow the DLE",
+      "socraticQuestion": "Why would taking on the risk that the AI works, by pricing on ROI or underwriting outcomes, strengthen rather than endanger an AI-First company's competitive position, and what must already be true of its DLE for that bet to pay?",
+      "visual": {
+        "type": "stack",
+        "title": "Vertical Integration Pyramid",
+        "caption": "Each layer climbed captures more feedback data and more gross margin for the vendor.",
+        "items": [
+          {
+            "label": "Services and people",
+            "detail": "Staff handle exceptions and act on predictions with customers"
+          },
+          {
+            "label": "Proprietary software",
+            "detail": "Interfaces like a CRM or ticket logger deliver predictions"
+          },
+          {
+            "label": "Predictive models",
+            "detail": "Own models trained on proprietary, labeled data"
+          },
+          {
+            "label": "Data and labeling",
+            "detail": "Collect, prepare and label customer data in-house"
+          },
+          {
+            "label": "Infrastructure",
+            "detail": "Own computing, data and monitoring systems"
+          },
+          {
+            "label": "Financing",
+            "detail": "Own balance sheet guarantees results when the model breaks"
+          }
+        ]
+      },
+      "visualAfterSprint": 0,
+      "color": "#EF4444",
+      "sprintCount": 4,
+      "lifeExample": "Una vez que predices bien la demanda y bajas mermas, usa ese ahorro y esos datos para sumar otra ventaja: negociar con proveedores con base en datos, cobrar por resultados o integrar un paso más de la cadena."
+    },
+    {
+      "id": "the-aifirst-company-99",
+      "bookTitle": "The AI-First Company",
+      "chapter": "99: Conclusion",
+      "supportingContext": "Fontana ends by writing out his formula one last time: data learning effects = economies of scale to data + data processing capabilities + data network effects. This time the fresh data in the equation comes from no customer, sensor or website.",
+      "goldenThread": "You can run a data learning effect on your own learning, treating the book's frameworks as data you keep processing at work and networking with others, and that personal loop is what lets you put AI first in your company.",
+      "narrativeSprints": [
+        "Fontana asks you to imagine the vocabulary and frameworks from the book as fresh data. The processing happens when you think about them at your job. Each paragraph, illustration and example adds another piece to your network of information. In his framing, reading the book was only what got the flywheel started.",
+        "Keeping that loop growing follows the same three parts as any data learning effect. You can add more input through supplementary materials, worksheets and courses, and keep processing it in your day job. You can grow the network by joining online communities, which adds many more nodes. Once AI comes first in your own learning, you can bring it into your company's strategy, budget and staff meetings, and approach the next project with a Lean AI mindset even if you start small.",
+        "From there, Fontana sketches the path ahead: leading customer implementations in ways that get AI accepted, installing automatic management systems, and setting up metrics to track progress. Accumulating information across the company lets you keep improving your decisions, and eventually your machines help at greater scale and speed. He lists the ways to outpace competitors, namely vertical integration, disruption, positioning through standardization, aggregation and subordination. He closes by reminding you that the AI-First Century is only a little past its midpoint, so there is still time to build third-wave tools that give everyone leverage."
+      ],
+      "tags": [
+        "Learning",
+        "Strategy",
+        "Leadership"
+      ],
+      "masteryStatus": "Red",
+      "level": 2,
+      "authorQuote": "AI-First companies put AI first.",
+      "keyMechanism": "Personal Data Learning Effect → fresh input from the book's frameworks, processed in your day job, and multiplied by adding nodes through communities",
+      "socraticQuestion": "If a data learning effect needs fresh data, processing capability and a network, which of the three is weakest in your own learning about AI, and how would strengthening it change what you can bring to your company?",
+      "visual": {
+        "type": "cycle",
+        "title": "Your Personal Learning Loop",
+        "caption": "The book's formula applied to your own learning keeps the flywheel turning.",
+        "items": [
+          {
+            "label": "Fresh data",
+            "detail": "The book's vocabulary and frameworks"
+          },
+          {
+            "label": "Processing",
+            "detail": "Thinking them through in your day job"
+          },
+          {
+            "label": "Network",
+            "detail": "Online communities add many more nodes"
+          },
+          {
+            "label": "More input",
+            "detail": "Supplementary materials, worksheets and courses"
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "color": "#EF4444",
+      "sprintCount": 3,
+      "lifeExample": "Haz tu propio loop de aprendizaje: elige una idea del libro, aplícala esta semana en el negocio, anota qué pasó y compártelo con alguien del equipo. Cada vuelta te hace mejor que la anterior."
+    }
+  ],
+  "links": [
+    {
+      "source": "the-aifirst-company-0",
+      "target": "the-aifirst-company-1",
+      "label": "Framework"
+    },
+    {
+      "source": "the-aifirst-company-1",
+      "target": "the-aifirst-company-2",
+      "label": "Start the loop"
+    },
+    {
+      "source": "the-aifirst-company-2",
+      "target": "the-aifirst-company-3",
+      "label": "Feed the MVAP"
+    },
+    {
+      "source": "the-aifirst-company-3",
+      "target": "the-aifirst-company-5",
+      "label": "Data feeds models"
+    },
+    {
+      "source": "the-aifirst-company-4",
+      "target": "the-aifirst-company-5",
+      "label": "Teams build models"
+    },
+    {
+      "source": "the-aifirst-company-5",
+      "target": "the-aifirst-company-6",
+      "label": "Ship and maintain"
+    },
+    {
+      "source": "the-aifirst-company-6",
+      "target": "the-aifirst-company-7",
+      "label": "Monitor → measure"
+    },
+    {
+      "source": "the-aifirst-company-7",
+      "target": "the-aifirst-company-1",
+      "label": "Closing the loop"
+    },
+    {
+      "source": "the-aifirst-company-8",
+      "target": "the-aifirst-company-1",
+      "label": "Compounding advantage"
+    },
+    {
+      "source": "the-aifirst-company-8",
+      "target": "the-aifirst-company-99",
+      "label": "Put AI first"
+    }
+  ]
+}
