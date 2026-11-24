@@ -1,0 +1,668 @@
+{
+  "bookTitle": "Never Split the Difference",
+  "author": "Chris Voss con Tahl Raz",
+  "nodes": [
+    {
+      "id": "never-split-the-difference-1",
+      "bookTitle": "Never Split the Difference",
+      "chapter": "1: The New Rules",
+      "supportingContext": "Robert Mnookin, director of the Harvard Negotiation Research Project, invited me to his office for what he called a friendly coffee, and then a second professor walked in and his secretary set a tape recorder on the table. Mnookin smiled and opened with a threat: his kidnappers had my son, and the price was one million dollars.",
+      "goldenThread": "Negotiation is not a rational problem to be solved but an emotional game, so the FBI's tactical empathy, which works on the counterpart's feelings before their logic, outperforms Harvard's airtight reasoning everywhere from kidnappings to car lots.",
+      "narrativeSprints": [
+        "I had spent two decades in the FBI and was the Bureau's lead international kidnapping negotiator, yet sitting across from Robert Mnookin and Gabriella Blum at Harvard I felt real panic. Mnookin played the kidnapper and pushed hard: pay the million or my son dies. I let a long stare hang, smiled, and asked him, “How am I supposed to do that?” When he pressed again, I apologized, used his first name, and asked how I could know my son was even alive. Every threat he and then Blum threw at me came back as the same quiet question, and within minutes Mnookin's face was red with frustration. When I called it off, he admitted the FBI might have something to teach them.",
+        "What I was using is what my firm, The Black Swan Group, now calls calibrated questions: open-ended queries that have no fixed answer, that buy you time and hand your counterpart the illusion of control while quietly boxing them in. Instead of defending myself, I shifted the frame so the kidnapper had to solve my logistical problems. Daniel Kahneman explains why it works: we run on a fast, emotional System 1 that feeds and steers the slow, logical System 2. If you shape someone's gut reaction with how you frame and deliver a question, their rational mind will build the justification afterward. The FBI's answer to that reality is tactical empathy, listening as a martial art that blends emotional intelligence with assertive influence to get inside another person's head.",
+        "In Harvard's 2006 Winter Negotiation Course, I was paired with a confident student I'll call Andy, and by asking variations of “How am I supposed to do that?” I walked away with every dime of his budget, including the quarter he was supposed to hold in reserve; the next day I did it again to another partner. The FBI learned this the hard way: thirty-nine hostages died at Attica in 1971, eleven Israeli athletes died in Munich in 1972, and on the Jacksonville tarmac in October 1971 agents shot out George Giffe's engine and he killed two hostages and himself. In Downs v. United States in 1975 the court ruled that a reasonable attempt at negotiation must come before tactical force. After Ruby Ridge and Waco, the Bureau formed the Critical Incident Response Group in 1994. When Fred Lanceley and Gary Noesner asked thirty-five veteran officers who had faced a classic rational bargaining situation, no hand went up; when they asked who had faced someone in emotional crisis with no clear demands, every hand did.",
+        "You may never face a terrorist, yet almost every exchange at work and at home boils down to an animal urge: I want. You want the contract signed, the car at your price, the raise, the kid in bed by nine. Negotiation does two jobs, gathering information and influencing behavior, and it is really just communication with results. Now picture a hostage negotiator facing a bank robber with four hostages: he cannot offer to take two and call it even. He has to get everything he asks for while leaving the other side feeling the relationship is good, and the only tool that does that runs through emotion rather than logic."
+      ],
+      "tags": [
+        "Empathy",
+        "Emotions",
+        "Questions",
+        "Listening"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "Feeling, they discovered, is a form of thinking.",
+      "keyMechanism": "Tactical Empathy → listening as a martial art: combining emotional intelligence with assertive influence to gain access to the mind of another person.",
+      "socraticQuestion": "If System 1 feelings generate the reasons System 2 later offers, why would a perfectly logical offer still lose to a simple question like “How am I supposed to do that?”",
+      "visual": {
+        "type": "compare",
+        "title": "Getting to Yes vs. the FBI",
+        "caption": "Harvard's rational problem-solving tenets against the psychological goals the FBI adopted for emotional crises.",
+        "columns": [
+          {
+            "label": "Getting to Yes (rational)",
+            "points": [
+              "Separate people from the problem",
+              "Focus on interests, not positions",
+              "Generate win-win options",
+              "Agree on evaluation standards"
+            ]
+          },
+          {
+            "label": "FBI tactical empathy (emotional)",
+            "points": [
+              "Calm people down",
+              "Establish rapport",
+              "Gain trust",
+              "Elicit verbalization of needs",
+              "Persuade them of our empathy"
+            ]
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "lifeExample": "Cuando un proveedor te presente un aumento de precio con argumentos impecables, no le contraargumentes con números: mírale con calma y pregúntale «¿Cómo se supone que haga eso?». Deja que sea él quien busque la manera de resolver tu problema y verás que, al responder, suele empezar a negociar contra sí mismo.",
+      "color": "#EF4444",
+      "sprintCount": 4
+    },
+    {
+      "id": "never-split-the-difference-2",
+      "bookTitle": "Never Split the Difference",
+      "chapter": "2: Be a Mirror",
+      "supportingContext": "On September 30, 1993, two masked robbers stormed a Chase Manhattan branch in Brooklyn, pistol-whipped the guard and a teller, and took hostages in my very first live hostage job. Command expected a quick surrender, and the ringleader on the phone kept insisting every decision belonged to four volatile partners somewhere inside the bank.",
+      "goldenThread": "Negotiation is a process of discovery rather than a battle of arguments, so a calm downward voice, a simple mirror and a few seconds of silence get your counterpart talking until they hand you the information you need.",
+      "narrativeSprints": [
+        "My partner and I set up in a bank across a narrow street, less than thirty yards from the Chase branch, while the NYPD negotiator, Joe, worked the phone and the rest of us listened in and passed notes. The lead robber threw up smoke screen after smoke screen: he hid his name, disguised his voice, put Joe on “hold” and hung up, and kept asking for a van so he could supposedly drive everyone to the precinct to surrender. A food delivery got arranged and then cancelled. Meanwhile investigators ran every car parked on the street and reached every owner except one, a man named Chris Watts, and a witness identified him by his voice alone. After five hours, the lieutenant pulled Joe and put me on the line.",
+        "Most people go into a negotiation so busy rehearsing their own arguments that they can't listen; George Miller's research suggests we can only hold about seven pieces of information in mind at once, so a conversation between two people becomes four voices talking at once. The cure is to make the other person your sole focus, to slow down, and to let your voice do the work. Of the three voices available, the positive/playful one should be your default, the assertive one almost never, and the late-night FM DJ voice, deep, slow and inflected downward, is for when you need to signal calm control. Then comes mirroring: repeat the last three words, or the critical one to three words, of what someone just said. We fear what's different and are drawn to what's similar, so a mirror quietly tells the other side's unconscious that you are alike, and they keep talking.",
+        "When Watts asked what happened to Joe, I told him flatly, “Joe's gone. You're talking to me now.” I mentioned the unexplained car and he blurted that we'd chased his driver away; I answered, “We chased your driver away?” and he started vomiting information about an accomplice we never knew existed. I blew the next one by asking, “Are you Chris Watts?”, which he simply denied, then recovered by slowing down and mirroring, “No? You said ‘okay.’” His rattled partner Bobby Goodwin took the phone, and after a pause following “Do you want to come out first?” he walked out with his hands up. Psychologist Richard Wiseman found waiters who mirrored orders earned tips 70 percent higher than those who praised customers, and one of my students used “I'm sorry, two copies?” and “Anywhere?” on an impulsive boss until he settled for two digital backups.",
+        "Everything we assumed that morning in Brooklyn turned out to be wrong: there were no four foreign partners, only a cash courier who had tricked his accomplice into a robbery. Good negotiators prepare for surprises; great ones use their skills to uncover the surprises they know are hiding there. That means treating every assumption as a hypothesis to test, and never letting your eagerness for a quick answer step on a mirror that needs silence to work. Think of Oprah Winfrey coaxing strangers to tell millions of viewers the secrets they had kept for a lifetime. She does not win by arguing better; she wins by making the person across from her feel safe enough to keep going."
+      ],
+      "tags": [
+        "Listening",
+        "Mirroring",
+        "Voice",
+        "Rapport"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "Negotiation is not an act of battle; it’s a process of discovery.",
+      "keyMechanism": "Mirroring → repeating the last three words (or the critical one to three words) of what someone just said, so they elaborate, bond with you and reveal more.",
+      "socraticQuestion": "Why would simply repeating someone's last few words, followed by silence, extract more information than asking them a direct question about what they mean?",
+      "visual": {
+        "type": "flow",
+        "title": "Confront Without Confrontation",
+        "caption": "Voss's sequence for disagreeing with a forceful counterpart without a fight.",
+        "items": [
+          {
+            "label": "Late-night FM DJ voice",
+            "detail": "Deep, slow, downward inflection that conveys calm control"
+          },
+          {
+            "label": "Start with “I'm sorry…”",
+            "detail": "Soften the opening before you challenge anything"
+          },
+          {
+            "label": "Mirror",
+            "detail": "Repeat their last three or critical one to three words"
+          },
+          {
+            "label": "Silence",
+            "detail": "At least four seconds to let the mirror work"
+          },
+          {
+            "label": "Repeat",
+            "detail": "Run the cycle again; they reword it each time"
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "lifeExample": "Si tu proveedor de pescado te dice «Este mes tenemos que subir el precio», respóndele con voz pausada de locutor nocturno: «Perdón, ¿subir el precio?», y quédate callado al menos cuatro segundos. Él volverá a explicarlo con otras palabras y, casi siempre, te revelará la verdadera razón o un margen que no pensaba darte.",
+      "color": "#EF4444",
+      "sprintCount": 4
+    },
+    {
+      "id": "never-split-the-difference-3",
+      "bookTitle": "Never Split the Difference",
+      "chapter": "3: Don't Feel Their Pain, Label It",
+      "supportingContext": "In 1998 I stood in a narrow hallway on the twenty-seventh floor of a Harlem high-rise, talking through a closed apartment door to at least three fugitives who had recently used automatic weapons in a gang shoot-out. There was no phone line into the apartment, and for six straight hours not a single word came back from inside.",
+      "goldenThread": "Instead of setting emotions aside, the best negotiators name them out loud, because a calm label drains a fear of its power and makes the other side feel understood enough to move.",
+      "narrativeSprints": [
+        "With SWAT behind me and snipers on the rooftops, I spoke to that apartment door in my late-night FM DJ voice, rotating with two FBI agents in training so none of us would stumble from fatigue. I gave no orders and asked for nothing. I just kept saying things like “It looks like you don't want to come out” and “It seems like you worry that if you open the door, we'll come in with guns blazing.” Six hours of silence went by, and we had almost decided the place was empty when a sniper saw a curtain move. The door opened, a woman stepped out, and then all three fugitives followed. Once they were cuffed, they told me I had calmed them down and they finally believed I wasn't going away.",
+        "Empathy is recognizing your counterpart's perspective and saying that recognition out loud; it is not agreeing with them or being nice, which is sympathy. Tactical empathy goes a step further: you read their feelings in the moment and what sits behind them, so you can shape every moment that follows. The tool is labeling: you spot an emotion through their words, music and dance, then name it with “It seems like…”, “It sounds like…” or “It looks like…”, never “I'm hearing,” because “I” puts people on guard. Then you go silent and let the label pull them out. Labels aimed at the underlying feeling rather than the presenting behavior defuse negatives and reinforce positives, and the accusation audit takes it further: you list the worst things they could say about you and say them first.",
+        "Matthew Lieberman at UCLA found that naming an emotion shifts brain activity away from the fear-generating amygdala toward rational areas. When I angered the FBI's top official in Canada by skipping country clearance, I opened the call with “Bless me, Father, for I have sinned,” and he granted the clearance. My student TJ rewrote the Washington Redskins' cold collection script to acknowledge hard economic times and “YOUR Washington Redskins,” and set up payment plans with all forty delinquent ticket holders. A Girl Scouts fund-raiser told a stubborn donor “I'm sensing some hesitation with these projects,” and a second label about her passion produced a check with no project chosen. Anna listed every accusation ABC Corp. could throw at her, opened with them, said “It sounds like you think we are the big, bad prime contractor,” and the renegotiation brought her firm $1 million.",
+        "In my classroom hostage game, I don't ask for volunteers; I warn them it's going to be horrible, and I always get more hands than I need. Saying “I don't want to sound harsh” denies the negative and gives it credence, whereas naming it outright takes the sting out. At a Dallas gate, my student Ryan followed an angry couple, labeled the agent's rough day, mirrored “The big game?” and “Booked solid?”, and only then asked whether a seat might open; thirty seconds of silence later he had a boarding pass in Economy Plus. The reasons someone won't make a deal are often stronger than the reasons they will. So the question is not how to sell your destination, but which fears are blocking the road to it."
+      ],
+      "tags": [
+        "Empathy",
+        "Labeling",
+        "Emotions",
+        "Accusation Audit"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "Emotions aren’t the obstacles, they are the means.",
+      "keyMechanism": "Labeling → validating someone's emotion by naming it aloud (“It seems like…”), which defuses negative feelings and reinforces positive ones.",
+      "socraticQuestion": "Why does saying your counterpart's worst accusation out loud before they can make it weaken the accusation instead of confirming it?",
+      "visual": {
+        "type": "flow",
+        "title": "How to Label an Emotion",
+        "caption": "The labeling sequence Voss lays out, from spotting a feeling to letting the label work.",
+        "items": [
+          {
+            "label": "Detect the emotion",
+            "detail": "Read words, music and dance for changes in response"
+          },
+          {
+            "label": "Target the underlying feeling",
+            "detail": "Look beneath the presenting behavior to what drives it"
+          },
+          {
+            "label": "Label it aloud",
+            "detail": "Begin with “It seems like…”, “It sounds like…”, “It looks like…”"
+          },
+          {
+            "label": "Avoid “I”",
+            "detail": "“I'm hearing that” puts people on guard"
+          },
+          {
+            "label": "Go silent",
+            "detail": "Let the label invite them to reveal themselves"
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "lifeExample": "Antes de pedirle al casero que posponga el aumento de renta del restaurante, haz una auditoría de acusaciones y empieza tú: «Probablemente vas a pensar que soy el inquilino que siempre quiere pagar menos y que no entiende lo que te cuesta mantener el local». Después etiqueta su emoción con «Parece que te preocupa que los gastos del edificio no dejan de subir» y quédate en silencio para que te cuente lo que realmente le pesa.",
+      "color": "#EF4444",
+      "sprintCount": 4
+    },
+    {
+      "id": "never-split-the-difference-4",
+      "bookTitle": "Never Split the Difference",
+      "chapter": "4: Beware “Yes”—Master “No”",
+      "supportingContext": "A few weeks after arriving in Manhattan, Chris Voss walked up to Amy Bonderow, head of the FBI's Crisis Negotiation Team in New York, and asked to become a hostage negotiator. She fired back a string of flat refusals, told him to go away, and tossed in one odd piece of advice on his way out: volunteer at a suicide hotline.",
+      "goldenThread": "“No” is not the end of a negotiation but its real beginning, because saying it gives your counterpart the safety and control they need before they can commit to a genuine “Yes.”",
+      "narrativeSprints": [
+        "I was on the hotline at HelpLine, talking with Daryl, a cabbie and frequent caller who was terrified of stepping outside. I walked him through it, got him to admit nobody had hurt him in about a year, and by the end he couldn't name one reason to stay indoors. He even thanked me for doing such a great job, and I strutted into the monitoring room feeling like a superstar. My supervisor, Jim Snyder, smiled and told me it was one of the worst calls he had ever heard. If Daryl was congratulating me instead of himself, Jim said, then I had done the work and he would never act on it.",
+        "There are three kinds of “Yes”: Counterfeit, Confirmation, and Commitment, and they sound almost identical. A counterfeit “Yes” is an escape hatch, a confirmation “Yes” is a reflex to a black-or-white question, and only a commitment “Yes” leads to action and a signature. Push hard for “Yes” and you mostly collect counterfeits, because people feel cornered. “No,” on the other hand, gives the speaker a feeling of safety, security, and control, so I deliberately ask questions built to be turned down. When you hear “No,” pause, treat it as “I'm not ready” or “I need more information,” and follow with “What about this doesn't work for you?” or a label like “It seems like there's something here that bothers you.”",
+        "My colleague Marti Evelsizer, the FBI's Crisis Negotiation Coordinator in Pittsburgh, faced a jealous boss who meant to strip her of her position. She sat down and asked him, “Do you want the FBI to be embarrassed?” and when he said no, she asked what he wanted her to do; a minute later she walked out with her job. My student Ben Ottenhoff swapped a “Yes pattern” fund-raising script for a “No”-oriented one and got a 23 percent better rate of return. Instead of “Do you have a few minutes to talk?” I teach “Is now a bad time to talk?” And when someone stonewalls you by email, a single line works: “Have you given up on this project?”",
+        "The trap is taking people literally and believing that a smile and a nod mean agreement. Persuasion doesn't come from how brilliant or forceful you are; it comes from the other side convincing themselves that your solution is their own idea. When you're pressing for agreement, you are the hostage of “Yes,” and everyone at the table can feel it. If someone will never tell you “No” at all, that is its own warning sign of confusion or a hidden agenda. Watch where the real conversation starts once a counterpart has finally drawn a line."
+      ],
+      "tags": [
+        "No",
+        "Autonomy",
+        "Questions",
+        "Persuasion"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "“No” is the start of the negotiation, not the end of it.",
+      "keyMechanism": "“No”-oriented question → a question designed to be answered “No,” giving your counterpart safety and control so they define what they want",
+      "socraticQuestion": "If “Yes” is the goal of every negotiation, why does chasing it early make a real commitment less likely, and what does a counterpart gain by being allowed to refuse you first?",
+      "visual": {
+        "type": "compare",
+        "title": "Pushing for Yes vs. Inviting No",
+        "caption": "The same goal, approached from opposite ends: one corners your counterpart, the other hands them control.",
+        "columns": [
+          {
+            "label": "Pushing for “Yes”",
+            "points": [
+              "“Do you have a few minutes to talk?”",
+              "Telemarketer: “Do you enjoy a nice glass of water?”",
+              "“Yes pattern” fund-raising script",
+              "Counterpart grows defensive and wary",
+              "Yields counterfeit or confirmation “Yes”"
+            ]
+          },
+          {
+            "label": "Inviting “No”",
+            "points": [
+              "“Is now a bad time to talk?”",
+              "Marti: “Do you want the FBI to be embarrassed?”",
+              "“No”-oriented script: 23 percent better return",
+              "Counterpart feels safe and in control",
+              "Opens the path to commitment “Yes”"
+            ]
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "lifeExample": "Cuando un proveedor deje de contestar tus correos sobre un pedido o una cotización pendiente, mándale una sola línea: «¿Ya renunciaste a este proyecto?», para que responda «No» y se sienta en control al explicarte qué pasó. Y al llamar a tu casero para renegociar la renta, no abras con «¿Tienes unos minutos?», sino con «¿Es mal momento para hablar?».",
+      "color": "#EF4444",
+      "sprintCount": 4
+    },
+    {
+      "id": "never-split-the-difference-5",
+      "bookTitle": "Never Split the Difference",
+      "chapter": "5: Trigger the Two Words That Immediately Transform Any Negotiation",
+      "supportingContext": "In August 2000, the Abu Sayyaf rebel leader Abu Sabaya held twenty-four-year-old Californian Jeffrey Schilling on Jolo Island and demanded $10 million, calling it war damages for five hundred years of oppression. For four months no logic, reasoning or argument from the FBI moved him off that number, and then a two-page memo changed everything.",
+      "goldenThread": "The sweetest words in a negotiation are not “yes” or “you're right” but “That's right,” which comes only when you summarize someone's world so completely that they embrace your understanding as their own.",
+      "narrativeSprints": [
+        "I was running strategy for the FBI on the Schilling kidnapping, with a Filipino officer named Benjie doing the talking to Sabaya in Tagalog. Benjie led the Philippine National Police's Special Action Force and despised the man; Sabaya had once come on Benjie's radio to gloat over the body of one of his men. One Saturday night, in the library of the American ambassador's summer residence, I could see Benjie snarling as I argued for building rapport. So I negotiated with him first: “You hate Sabaya, don't you?” He erupted, poured it all out, and then I watched him settle down and take control of his anger.",
+        "At the FBI's Crisis Negotiation Unit we built the Behavioral Change Stairway Model: active listening, empathy, rapport, influence, and behavioral change. It traces back to Carl Rogers and his idea of unconditional positive regard, because people only truly change when they feel accepted as they are. To get there, I wrote Benjie a plan using almost every active listening tool: effective pauses, minimal encouragers, mirroring, labeling, paraphrasing, and finally a summary. A good summary is paraphrasing plus labeling, a full rearticulation of “the world according to” your counterpart along with the emotions under it. Do that completely, and the only honest reply left is “That's right.”",
+        "Two days after the memo, Benjie laid out Sabaya's own version of history and the feelings attached to it; Sabaya went silent for nearly a minute and then said, “That's right.” The war damages demand vanished, and he never asked for money again. My son Brandon kept telling his coach and me “you're right” about dodging blockers as a linebacker, then went back to flattening them, until I told him it seemed he thought dodging a block was unmanly. A pharmaceutical rep won over a cold, dismissive doctor by summarizing his passion for tailoring treatment to each patient. And a Korean student drew his ex-boss into two “that's rights” that exposed his need for an ally at headquarters and his hope for a vice presidency.",
+        "More than 90 percent of heart surgery patients who swear “Yes, I will change!” haven't changed their lifestyle two years later. Agreement on the surface and agreement in the gut are two very different animals. “You're right” is what people say to make you go away, and it leaves them owning nothing. Watch the difference when a counterpart pronounces your words correct of their own free will. Something shifts in that moment, and it rarely shows up at the start of a conversation."
+      ],
+      "tags": [
+        "Empathy",
+        "Summary",
+        "Listening",
+        "Rapport"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "As you’ll soon learn, the sweetest two words in any negotiation are actually “That’s right.”",
+      "keyMechanism": "Summary → paraphrasing plus labeling: rearticulating “the world according to” your counterpart until they say “That's right”",
+      "socraticQuestion": "Why does a counterpart who says “That's right” actually change course while one who says “You're right” or “Yes” usually does not, given that all three sound like agreement?",
+      "visual": {
+        "type": "flow",
+        "title": "The Road to “That's Right”",
+        "caption": "The active listening tactics Voss scripted for Benjie, building cumulatively toward a summary.",
+        "items": [
+          {
+            "label": "Effective Pauses",
+            "detail": "Silence drains emotion and keeps the counterpart talking"
+          },
+          {
+            "label": "Minimal Encouragers",
+            "detail": "“Yes,” “OK,” “Uh-huh,” “I see” signal full attention"
+          },
+          {
+            "label": "Mirroring",
+            "detail": "Listen and repeat back instead of arguing"
+          },
+          {
+            "label": "Labeling",
+            "detail": "Name their feelings and identify with them"
+          },
+          {
+            "label": "Paraphrase",
+            "detail": "Restate their meaning in your own words"
+          },
+          {
+            "label": "Summarize",
+            "detail": "Paraphrasing plus labeling triggers “That's right”"
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "lifeExample": "Cuando tu chef te insista en que necesita más personal, no le digas «tienes razón» para cerrar el tema; resume su mundo: «Parece que sientes que cargas la cocina solo en los fines de semana, y que nadie ve cuánto te está costando». Espera a que te diga «Así es» antes de proponerle cualquier solución, porque solo entonces va a escuchar la tuya como propia.",
+      "color": "#EF4444",
+      "sprintCount": 4
+    },
+    {
+      "id": "never-split-the-difference-6",
+      "bookTitle": "Never Split the Difference",
+      "chapter": "6: Bend Their Reality",
+      "supportingContext": "One Monday morning in Port-au-Prince, the panicked nephew of a prominent Haitian politician called the FBI office to say kidnappers had grabbed his aunt from her car and wanted $150,000. In those years Haiti had the highest kidnapping rate in the world, and the abductions kept following an odd rhythm that started every Monday and grew more frantic toward Friday.",
+      "goldenThread": "Every negotiation runs on hidden emotional drivers and irrational yet predictable patterns, so instead of splitting the difference you can bend your counterpart's sense of what they stand to gain and lose until your offer looks like the best deal available.",
+      "narrativeSprints": [
+        "The nephew's first instinct was to pay whatever the kidnappers asked, and the textbook instinct would have been to meet them halfway at $75,000. I told him no, because splitting the difference is like a husband wearing one black shoe and one brown one to please his wife. By listening to the kidnappers and debriefing rescued hostages, we figured out these weren't political crimes at all. They were thugs who wanted their money by Friday so they could party through the weekend. That self-imposed deadline, and the fact that a good weekend in Haiti cost nowhere near $150,000, put the leverage on our side.",
+        "We are all emotional and irrational, and in predictable ways, which is what Kahneman and Tversky captured in Prospect Theory. People reach for sure things over better odds, the Certainty Effect, and take bigger risks to avoid a loss than to land an equal gain, which is Loss Aversion. So I bend my counterpart's reality: I anchor their emotions with an accusation audit, let them name a number first, hint at a range, pivot to nonmonetary terms, use odd numbers, and offer an unexpected gift. Deadlines and the F-word, “Fair,” are part of the same terrain. When someone tells you “We've given you a fair offer,” mirror it back, “Fair?”, and then label: “It seems like you're ready to provide the evidence that supports that.”",
+        "In my Ultimatum Game, students split $10 every which way, and almost nobody offers the purely rational $1, because fairness is emotional. Robin Williams voiced the genie in Aladdin for $75,000 and only exploded after the film made $504 million. When a project went bad and I had to cut contractors from $2,000 a day to $500, I opened with “I got a lousy proposition for you,” listed every insult they might think about me, then said I wanted to bring it to them before anyone else, and every one took it. Jerry asked for $110,000 and learned his firm started others at $125,000; Angel Prado instead wrote “$134.5k—$143k” on his job description and walked away with $134,500. In Haiti, the nephew never named a price until the kidnappers had dropped to $25,000, then offered $3,000, then the odd figure $4,751 plus a portable CD stereo.",
+        "Show someone that you can give them what they want, and they'll weigh it; show them they could lose it, and they move. A red-and-white Swiss mug is worth about $3.50 when you're buying and $5 to $7 when it's yours. Twenty dollars for a three-minute errand thrills you until you learn it earned me a million. Nothing about the object changes, only where you stand when you look at it. The person across the table is reading the same numbers you are, through a lens you can shape."
+      ],
+      "tags": [
+        "Anchoring",
+        "Loss Aversion",
+        "Fairness",
+        "Bargaining"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "So don’t settle and—here’s a simple rule—never split the difference.",
+      "keyMechanism": "Loss Aversion → people take greater risks to avoid losses than to achieve gains, so show them something concrete to lose if the deal falls through",
+      "socraticQuestion": "If the value of an offer depends on the vantage point from which it is seen, what makes an anchor ethical rather than manipulative, and why does Voss insist that compromise is the riskier path?",
+      "visual": {
+        "type": "flow",
+        "title": "Bending Their Reality",
+        "caption": "Voss's six prospect theory tactics for reshaping how your counterpart perceives an offer.",
+        "items": [
+          {
+            "label": "Anchor their emotions",
+            "detail": "Open with an accusation audit to brace them for loss"
+          },
+          {
+            "label": "Let them go first",
+            "detail": "Let the other side anchor money, most of the time"
+          },
+          {
+            "label": "Establish a range",
+            "detail": "Recall a similar deal to set your ballpark"
+          },
+          {
+            "label": "Pivot to nonmonetary terms",
+            "detail": "Trade things cheap to them, valuable to you"
+          },
+          {
+            "label": "Use odd numbers",
+            "detail": "Figures like $37,263 feel calculated and immovable"
+          },
+          {
+            "label": "Surprise with a gift",
+            "detail": "After a rejection, an unrelated gift triggers reciprocity"
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "lifeExample": "Antes de pedirle a tu proveedor de carne un descuento fuerte, ánclalo con una auditoría de acusaciones: «Tengo una propuesta que te va a parecer pésima; vas a pensar que soy un cliente codo que no valora tu producto», y luego dile que querías ofrecérsela a él antes que a otro distribuidor. Si te contesta que su precio «es justo», refléjalo con «¿Justo?» y etiqueta: «Parece que estás listo para mostrarme los números que lo respaldan».",
+      "color": "#EF4444",
+      "sprintCount": 4
+    },
+    {
+      "id": "never-split-the-difference-7",
+      "bookTitle": "Never Split the Difference",
+      "chapter": "7: Create the Illusion of Control",
+      "supportingContext": "In 2001 Voss was ordered back to Manila after the Abu Sayyaf seized twenty hostages at the Dos Palmas diving resort, three of them Americans. Months later, combing through the case files, he found that a crooked Philippine politician had gotten hostage Martin Burnham on the phone for free.",
+      "goldenThread": "The upper hand belongs to whoever lets the other side feel in charge, and calibrated “What” and “How” questions do exactly that by turning your demands into requests for help that get your counterpart to solve your problem for you.",
+      "narrativeSprints": [
+        "Dos Palmas was the biggest failure of my career. Over thirteen months I watched Guillermo Sobero get beheaded, a donor’s $300,000 ransom vanish when the kidnappers claimed it was $600 short, and a botched Philippine “rescue” kill Martin Burnham and the nurse Ediborah Yap with friendly fire. Back home, going through the files, I found the detail that really stung. A crooked Philippine politician running his own side negotiation had gotten Martin on the phone, and he hadn’t paid a thing for it. My FBI-trained team had never even asked.",
+        "Our problem was a tit-for-tat mindset: every “ask” meant we would owe, so we stayed frozen in showdowns and closed-ended proof-of-life questions like the name of Martin’s first dog. Then my partner Chuck brought me tapes from a Pittsburgh case in which an uncoached drug dealer asked the man holding his girlfriend, “Hey, dog, how do I know she’s all right?” The kidnapper went quiet for ten seconds and then offered to put her on the phone, convinced it was his own idea. That is a calibrated question: an open-ended “How” or “What” that asks for help, suspends what psychologist Kevin Dutton calls unbelief, and gives your counterpart the illusion of control. You don’t push people to your idea; you ride their own energy toward it.",
+        "I gave a public relations client who wasn’t getting paid one line to use after summarizing her situation: “How am I supposed to do that?” Her big corporate client apologized, handed her a new accounting contact and paid her within forty-eight hours. The rules are simple: skip “can,” “is,” “are,” “do” and “does,” start with “What” or “How,” and keep away from “Why” unless the defensiveness it stirs up works in your favor. Even “Why did you do it?” softens into “What caused you to do it?” When an FBI boss started second-guessing a Harvard program he had already approved, I asked what he’d had in mind when he signed off, and he leaned back, steepled his fingers and simply told me to brief everyone when I got back.",
+        "Every one of these tools fails without self-control. For a freelance marketing strategist owed about $7,000 by a penny-pinching CEO, I built an eight-step script, from a “No”-oriented email through labels and calibrated questions, the kind of script that works about 90 percent of the time when the negotiator stays calm. The CEO called back within ten minutes, his patronizing voice set her off, and she turned the call into a showdown; she didn’t even collect half. When people feel they have lost control they slip into a hostage mentality and either get defensive or lash out, and that goes for you as much as for the other side. So ask yourself who really runs a conversation: the person talking, or the trained listener quietly steering the talker’s energy."
+      ],
+      "tags": [
+        "Questions",
+        "Control",
+        "Self-Control"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "the secret to gaining the upper hand in a negotiation is giving the other side the illusion of control.",
+      "keyMechanism": "Calibrated questions → open-ended “What” and “How” questions that ask for help, remove aggression and give your counterpart the illusion of control while you frame the conversation toward your solution.",
+      "socraticQuestion": "If a calibrated question makes your counterpart feel in control, where does your own control actually come from, and why does it disappear the moment you lose your temper?",
+      "visual": {
+        "type": "compare",
+        "title": "Closed vs. Calibrated Questions",
+        "caption": "The book’s rules and examples for turning a confrontational ask into a question that hands over the illusion of control.",
+        "columns": [
+          {
+            "label": "Closed-ended",
+            "points": [
+              "Start with can, is, are, do, does",
+              "Answered with a quick yes or no",
+              "“Does this look like something you would like?”",
+              "“Why did you do it?”",
+              "“You can’t leave.”",
+              "Triggers reciprocity: you’ll owe something back"
+            ]
+          },
+          {
+            "label": "Calibrated",
+            "points": [
+              "Start with What or How, rarely Why",
+              "Make them think and speak expansively",
+              "“How does this look to you?”",
+              "“What caused you to do it?”",
+              "“What do you hope to achieve by going?”",
+              "Asks for help, offers no target for attack"
+            ]
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "lifeExample": "Cuando un proveedor te avise que el precio del salmón sube a partir del lunes, no le respondas «No puedo pagar eso»; resume la situación con calma y pregúntale, con tono de verdadera petición de ayuda, «¿Cómo se supone que haga eso?». Después sigue con preguntas que empiecen con «qué» o «cómo», como «¿Qué es lo más importante para ti en este pedido?», para que él mismo termine proponiendo la solución que tú buscas.",
+      "color": "#EF4444",
+      "sprintCount": 4
+    },
+    {
+      "id": "never-split-the-difference-8",
+      "bookTitle": "Never Split the Difference",
+      "chapter": "8: Guarantee Execution",
+      "supportingContext": "During a prison siege in St. Martin Parish, Louisiana, negotiators handed the armed inmates a pair of walkie-talkies and designed a surrender ritual in which each man would walk past three law-enforcement perimeters and radio back from jail. The first inmate made it all the way to the paddy wagon before one officer noticed the radio in his hand.",
+      "goldenThread": "An agreement is worthless until it is carried out, so you keep asking “How” until your counterpart defines success in their own words, test every “Yes” until you know it is real, and win over the people behind the table who can still kill the deal.",
+      "narrativeSprints": [
+        "About a year after Dos Palmas, a Colombia-based rebel group pulled José, an American ecotourism guide, out of his truck near the Ecuadoran border while his wife Julie sat in the cab with their baby. The kidnappers wanted $5 million, and I finally had a live case to test calibrated questions. My negotiators coached Julie to meet every demand with a question: “How do I know José is alive?” “How can we raise that much?” “How can we pay you anything until we know José is okay?” Her persistence and tiny offers brought the demand down to $16,500 and kept buying time. Then, on a night of pounding rain, with most of the guerrillas gone and one teenage guard asleep, José slipped out a window and made his way home.",
+        "A “How” question is a gentle, graceful way of saying “No,” and “How am I supposed to do that?” became our standard reply to ransom demands because it creates what I call forced empathy. It also makes your counterpart spell out how a deal will actually be carried out, and people work harder on a solution they believe is theirs. I push for two questions, “How will we know we’re on track?” and “How will we address things if we find we’re off track?”, and summarize the answers until I hear “That’s right.” If I hear “You’re right” or “I’ll try,” I know nobody is invested, and I dig back in with more “How.” Then I apply the Rule of Three, getting the same agreement three times with varied tactics, because faking conviction over and over is really hard.",
+        "When I debriefed José in upstate New York, he told me Julie’s questions kept sending the kidnappers’ negotiator back into the jungle for long group huddles, which meant their whole side was coordinating around our goals. I learned the cost of ignoring behind-the-table, or Level II, players in private practice, when a lucrative training deal blessed by a Florida CEO and his head of HR was killed by the division head whose people would have received it. In the Philippines I fed Aaron Onglingswan question after question for the cabbie who had drugged and chained his brother Alastair, until Aaron asked, “When we run out of money, what will happen?” and the kidnapper answered, “It will be all right.” I also listen past the words with Albert Mehrabian’s 7-38-55 rule: 7 percent words, 38 percent tone of voice, 55 percent body language and face. And Deepak Malhotra’s research found that liars use more words and more third-person pronouns, a pattern his team named the Pinocchio Effect.",
+        "My student Jesus Bueno coached his brother Joaquin through buying out a feuding partner, Bruno, in a cannabis grow shop in northern Spain, and Bruno’s advisor opened at a precise €30,812. Joaquin answered with gentle, apologetic “No”s that praised the offer and made no counteroffer, and the price slid to €28,346 and then €25,000. Joaquin wanted to grab it, Jesus kept him focused, and a final email offering €23,567 was accepted within an hour. Even at an outlet mall, introducing myself and asking for “the Chris discount” got me ten percent off. In every one of these cases, the question that mattered was never whether the other side said “Yes.”"
+      ],
+      "tags": [
+        "Implementation",
+        "Questions",
+        "Agreement",
+        "Lie Detection"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "“Yes” is nothing without “How.”",
+      "keyMechanism": "Rule of Three → get your counterpart to agree to the same thing three times in one conversation, varying the tactic each time, to tell a real “Yes” from a counterfeit one.",
+      "socraticQuestion": "Why can a counterpart who has already said “Yes” still sink the deal, and what changes about who owns the outcome when you make them describe the “How” in their own words?",
+      "visual": {
+        "type": "flow",
+        "title": "The Rule of Three",
+        "caption": "Get the same agreement three times in one conversation, varying the tactic so you never sound like a broken record.",
+        "items": [
+          {
+            "label": "Get the commitment",
+            "detail": "They agree or commit to something: that’s No. 1."
+          },
+          {
+            "label": "Label or summarize",
+            "detail": "Restate what they said so they answer “That’s right.”"
+          },
+          {
+            "label": "Ask about implementation",
+            "detail": "A calibrated question: “What do we do if we get off track?”"
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "lifeExample": "Cuando tu gerente de cocina acepte reducir la merma, no te quedes con ese «sí»: resume lo acordado hasta que te diga «Eso es», y luego pregúntale «¿Cómo vamos a saber que vamos bien?» y «¿Qué hacemos si nos desviamos?». Si te responde «Lo intentaré», tómalo como señal de alarma y sigue con preguntas de «cómo» hasta que él mismo defina, con sus propias palabras, cómo se va a cumplir.",
+      "color": "#EF4444",
+      "sprintCount": 4
+    },
+    {
+      "id": "never-split-the-difference-9",
+      "bookTitle": "Never Split the Difference",
+      "chapter": "9: Bargain Hard",
+      "supportingContext": "Voss walked into the only dealer around Washington, D.C., with a Salsa Red Pearl Toyota 4Runner on the lot, and a salesman named Stan quoted him a sticker price of $36,000. Voss answered with an all-cash offer of $30,000 and a deferential question about how he was supposed to pay more.",
+      "goldenThread": "Hard bargaining is won by preparation rather than nerve: know your counterpart’s style, absorb the extreme anchor, set boundaries without making an enemy, and follow an Ackerman plan of 65, 85, 95 and 100 percent that ends on a precise nonround number.",
+      "narrativeSprints": [
+        "I fell hard for a Salsa Red Pearl Toyota 4Runner, and only one dealer around Washington, D.C., had one. When the salesman, Stan, quoted $36,000, I offered $30,000 in cash, apologized that I couldn’t pay more, and then asked, “How am I supposed to do that?” He disappeared into the back and returned with $34,000, then later with $32,500 on a sheet printed “YOU WIN” and ringed with smiley faces. Each time I praised the offer, said I was sorry, said I simply couldn’t, and let the silence sit. Two days later I drove home in that truck for $30,000.",
+        "For bare-knuckle haggling I still use the system I learned at FBI training, named for Mike Ackerman, an ex-CIA kidnap-for-ransom consultant. You set a target price, open at 65 percent of it, and plan three raises of shrinking size to 85, 95 and 100 percent. Before each raise you use empathy, calibrated questions and different ways of saying “No” to get the other side to counter first. The final figure is precise and nonround, and you add a nonmonetary item they probably don’t want to signal that you’re tapped out. The extreme anchor triggers fight-or-flight, the concessions play on reciprocity, and the halving increments convince your counterpart he has squeezed you dry.",
+        "In Haiti, where kidnappings ran two or three a week and market prices were $15,000 to $75,000 a victim, I aimed to come in under $5,000 every time. One case closed at $4,751, and the head of the Miami FBI office couldn’t stop laughing about what a single dollar could do. My Georgetown student Mishary, facing a renewal of $2,000 a month on a rent of $1,850, researched comparable apartments and settled on a target of $1,830. He anchored at $1,730, asked the agent how he priced renewals, moved to $1,790 and then $1,810, and finally did fake math on paper before landing on $1,829. The agent joked that he must be an accountant and agreed to a twelve-month lease.",
+        "None of this works if you can’t take a punch. Experienced negotiators lead with an extreme anchor, and you deflect it with “How am I supposed to accept that?” or pivot to terms, the way my student Farouq answered a dean’s $300 with a $1,000 anchor and came away with $750. You also have to read who sits across from you, an Analyst, an Accommodator or an Assertive, each of whom treats time and silence differently, and with three types there’s a 66 percent chance your counterpart’s “normal” isn’t yours. When you punch back, with strategic umbrage, a “Why” that makes them defend your side, or a cool “I” message, aim at the problem, never the person, and stay ready to walk away. Under all that pressure, what decides the outcome is something you did long before you sat down."
+      ],
+      "tags": [
+        "Bargaining",
+        "Anchoring",
+        "Negotiation Styles",
+        "Preparation"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "When the pressure is on, you don’t rise to the occasion; you fall to your highest level of preparation.",
+      "keyMechanism": "Ackerman model → an offer-counteroffer system: set a target, open at 65 percent, raise in decreasing increments to 85, 95 and 100 percent while using empathy and ways of saying “No,” then close on a precise nonround number plus a nonmonetary item.",
+      "socraticQuestion": "Why does the Ackerman model’s pattern of shrinking, reluctant concessions leave a counterpart more satisfied than a single “fair” offer, even when they end up with less?",
+      "visual": {
+        "type": "flow",
+        "title": "The Ackerman Model",
+        "caption": "Mike Ackerman’s haggling system, step by step as the book lists it.",
+        "items": [
+          {
+            "label": "Set your target price",
+            "detail": "Decide your goal before any offer is made."
+          },
+          {
+            "label": "Open at 65 percent",
+            "detail": "First offer at 65 percent of target sets an extreme anchor."
+          },
+          {
+            "label": "Raise to 85, 95, 100",
+            "detail": "Three raises of decreasing increments, dropped in sparingly."
+          },
+          {
+            "label": "Empathy and many “No”s",
+            "detail": "Get the other side to counter before you increase your offer."
+          },
+          {
+            "label": "Precise, nonround final number",
+            "detail": "$37,893 rather than $38,000 gives the number credibility and weight."
+          },
+          {
+            "label": "Add a nonmonetary item",
+            "detail": "On your final number, it shows you’re at your limit."
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "lifeExample": "Si quieres comprar un horno usado y tu meta es pagar 40,000 pesos, abre con 26,000 (el 65 %) y, antes de cada aumento, usa «¿Cómo se supone que haga eso?» o «Lo siento, eso no me funciona» para que el vendedor baje primero, subiendo después a 34,000 y luego a 38,000. Cierra con una cifra exacta y no redonda, como 39,870 pesos, y agrega algo no monetario, como pedirle que te deje las charolas, para mostrar que llegaste a tu límite.",
+      "color": "#EF4444",
+      "sprintCount": 4
+    },
+    {
+      "id": "never-split-the-difference-10",
+      "bookTitle": "Never Split the Difference",
+      "chapter": "10: Find the Black Swan",
+      "supportingContext": "At 11:30 a.m. on June 17, 1981, William Griffin walked down the stairs of his parents' Rochester home with a shotgun, and by afternoon he held nine employees of the Security Trust Company hostage. The FBI agents outside treated his three o'clock deadline as pressure tactics, because no hostage-taker in American history had ever killed a hostage on deadline.",
+      "goldenThread": "Every negotiation hides at least three Black Swans, unknown unknowns that surface only when you let your known knowns guide you without blinding you, listen past what you expect, and treat the 'crazy' moment as a clue, and each one multiplies your leverage.",
+      "narrativeSprints": [
+        "I first heard the story of June 17, 1981, from Clint Van Zandt in a training room at Quantico. William Griffin had shot his way from his parents' Rochester living room to the Security Trust Company and herded nine bank employees into a small office. At 2:30 he had the manager call the police with an ultimatum: come to the front doors for a shoot-out at three o'clock, or he would start killing hostages. Everyone on the scene knew that deadlines were just a way to focus the mind, and that what hostage-takers really wanted was money, respect and a helicopter. At exactly three, Griffin sent a young teller, Margaret Moore, to the glass doors and shot her, then pressed himself against a window in full view of the sniper across the street.",
+        "In every negotiation there are three kinds of information. Known knowns are what you already hold: your counterpart's name, their offer, your experience from past deals. Known unknowns are like poker wild cards, things you know are out there without knowing who holds them. Black Swans are the unknown unknowns, information you never imagined that would change everything if it surfaced, and they are leverage multipliers. Leverage itself comes in three kinds: positive, your power to give or withhold what they want; negative, your power to make them suffer, best voiced through a label like \"It seems like you don't care what position you are leaving me in\" instead of a threat; and normative, holding them to their own rules and standards.",
+        "In March 2003 I led the talks with Dwight Watson, a North Carolina tobacco farmer who drove a tractor he claimed was packed with bombs into a pond on the National Mall. Instead of arguing him into surrender, my team dug into who he was: a fifth-generation farmer losing his 1,200 acres, and an 82nd Airborne veteran whose code let him withdraw with honor if reinforcements hadn't come within three days. About thirty-six hours in, agent Winnie Miller, who had been tracking his subtle references, told me he was a devout Christian and that the next morning was the Dawn of the Third Day. When we said those words on the phone there was a long silence, a cough, and then Watson told us he would come out. Years later an MBA student of mine mislabeled a seller's motives on a Charleston building, the broker corrected him by revealing the seller needed cash for weaker properties in Atlanta and Savannah, and a $4.3 million asking price fell to $3.6 million.",
+        "The instant you most want to throw up your hands and say \"They're crazy!\" is a fork in the road. Malhotra and Bazerman name the usual reasons a counterpart only looks irrational: they are ill-informed, they are constrained, or they are serving interests you haven't seen yet, like the Coca-Cola contact who stopped answering because his division had collapsed and he had lost his influence. You won't pull that out of anyone by email, and rarely in a formal session; it slips out over a steak dinner, in the first and last minutes of a meeting, during an interruption when the facade cracks. What usually stops us from digging is not the person across the table at all, but our fear of conflict itself. So what changes if you stop looking to verify what you expect and start asking why they are saying what they are saying right now?"
+      ],
+      "tags": [
+        "Black Swans",
+        "Leverage",
+        "Listening",
+        "Worldview"
+      ],
+      "masteryStatus": "Red",
+      "level": 1,
+      "authorQuote": "What you don’t know can kill you, or your deal.",
+      "keyMechanism": "Black Swans → the unknown unknowns in a negotiation, pieces of information you never imagined that act as leverage multipliers once unearthed.",
+      "socraticQuestion": "If leverage is an emotional concept that exists in what your counterpart thinks you have, why would a seemingly innocuous piece of information they don't even value give you more leverage than anything you could research in advance?",
+      "visual": {
+        "type": "stack",
+        "title": "What You Know at the Table",
+        "caption": "The deeper the layer, the less you can predict it, and the more it can change the game.",
+        "items": [
+          {
+            "label": "Known Knowns",
+            "detail": "Their name, their offer, your experience from other negotiations."
+          },
+          {
+            "label": "Known Unknowns",
+            "detail": "Things you know exist but can't see, like poker wild cards."
+          },
+          {
+            "label": "Unknown Unknowns",
+            "detail": "Black Swans: never-imagined information that would change everything if uncovered."
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "lifeExample": "Si tu proveedor de carne de pronto deja de contestar o rechaza un trato razonable, no concluyas que está loco: busca su restricción oculta invitándolo a comer fuera del negocio, sin hablar de trabajo, y usando una etiqueta como «Parece que algo este mes te está complicando las entregas». Escucha con especial atención los primeros y los últimos minutos de la plática, porque ahí suele soltar el Cisne Negro, como un problema de crédito, un jefe nuevo o una meta de fin de año, que cambia toda tu negociación.",
+      "color": "#EF4444",
+      "sprintCount": 4
+    },
+    {
+      "id": "never-split-the-difference-98",
+      "bookTitle": "Never Split the Difference",
+      "chapter": "98: Prepare a Negotiation One Sheet",
+      "supportingContext": "In the entertainment industry, a single page called a \"one sheet\" sums up a product for publicity and sales. Voss's company has every client build a negotiation version of that page, and he estimates that good preparation pays back at least seven to one in time saved on renegotiating deals.",
+      "goldenThread": "Preparation is not a script for how the talk will unfold but one short sheet of tools, an ambitious written goal, a summary that earns \"That's right,\" prepared labels, calibrated questions and noncash offers, because under pressure you fall to your highest level of preparation.",
+      "narrativeSprints": [
+        "Say you're selling a pair of old speakers because you need $100 toward a new set. If that $100 is what you focus on, you'll relax the moment you hear it, and that is exactly what you'll walk away with. Most experts would have you build your preparation around your BATNA, Fisher and Ury's Best Alternative To a Negotiated Agreement, like a written $10,000 offer from another dealer for your old BMW. The trouble is that under stress the mind gravitates to whatever number carries the most psychological weight, so the BATNA quietly becomes your ceiling. That's the \"wimp-win\" mentality: you aim at your bottom line, and that's where you end up.",
+        "So my company has every client prepare a negotiation one sheet with five short sections. First comes the goal: think through best and worst cases, but write down only a specific, optimistic, reasonable best-case target, say $150 for those speakers since used audio stores sell them for $140, then discuss it with a colleague and carry it into the room. Second, a summary of the known facts in a couple of sentences, sharp enough that your counterpart would answer \"That's right.\" Third, an accusation audit: list every accusation they might throw at you, however unfair, and turn it into three to five labels you role-play beforehand. Fourth and fifth, three to five calibrated questions to reveal value and flush out deal killers, and a list of noncash items your counterpart holds that would be valuable to you.",
+        "The fill-in-the-blank tools come ready-made: \"It seems like ___ is valuable to you,\" \"It seems like you're reluctant to ___,\" and questions like \"What's the core issue here?\" or \"What does doing nothing cost you?\" asked in groups of two or three. Some questions aim behind the table, like \"How on board are the people not on this call?\", because a committee or a nervous insider can sink a deal you thought was done. Picture a buyer stalling on the accounting system you sell because his annual review is four months away; instead of cutting your price, you promise the installation in ninety days, guaranteed. When the lawyers' association wanted to pay me as little cash as possible to look good before its board, part of my fee became a cover story in their magazine. None of this is a preordained script, since rigid plans make you less agile at the table and easier prey for those who are."
+      ],
+      "tags": [
+        "Preparation",
+        "Goals",
+        "Questions",
+        "Labels"
+      ],
+      "masteryStatus": "Red",
+      "level": 2,
+      "authorQuote": "When the pressure is on, you don’t rise to the occasion—you fall to your highest level of preparation.",
+      "keyMechanism": "Negotiation One Sheet → a single preparatory page listing the tools you anticipate using, customized to this negotiation: goal, summary, labels/accusation audit, calibrated questions and noncash offers.",
+      "socraticQuestion": "Why would anchoring your preparation on a single written best-case goal, instead of on your BATNA, change not just what you ask for but how you hear every offer that falls short of it?",
+      "visual": {
+        "type": "flow",
+        "title": "The Negotiation One Sheet",
+        "caption": "Five short sections, prepared in this order before you sit down at the table.",
+        "items": [
+          {
+            "label": "The Goal",
+            "detail": "Write one specific, optimistic best-case goal, not your BATNA."
+          },
+          {
+            "label": "Summary",
+            "detail": "Known facts in a couple of sentences that earn \"That's right.\""
+          },
+          {
+            "label": "Labels / Accusation Audit",
+            "detail": "Three to five labels defusing any accusation they might make."
+          },
+          {
+            "label": "Calibrated Questions",
+            "detail": "Three to five What/How questions revealing value and deal killers."
+          },
+          {
+            "label": "Noncash Offers",
+            "detail": "What could they give that would almost get us to do it free?"
+          }
+        ]
+      },
+      "visualAfterSprint": 1,
+      "lifeExample": "Antes de renegociar la renta de tu restaurante, escribe en una sola hoja una meta concreta y ambiciosa (no tu mínimo), un resumen de dos frases al que el casero respondería «Así es», tres a cinco etiquetas como «Parece que valoras tener inquilinos estables» y preguntas calibradas como «¿Qué te cuesta que el local se quede vacío?». Agrega una lista de cosas no monetarias que él podría darte, como meses de gracia o permiso para remodelar la terraza, y lleva esa hoja contigo a la junta.",
+      "color": "#EF4444",
+      "sprintCount": 3
+    }
+  ],
+  "links": [
+    {
+      "source": "never-split-the-difference-1",
+      "target": "never-split-the-difference-2",
+      "label": "Tactical empathy tools"
+    },
+    {
+      "source": "never-split-the-difference-2",
+      "target": "never-split-the-difference-3",
+      "label": "Mirror → label"
+    },
+    {
+      "source": "never-split-the-difference-3",
+      "target": "never-split-the-difference-4",
+      "label": "Trust → safe \"No\""
+    },
+    {
+      "source": "never-split-the-difference-4",
+      "target": "never-split-the-difference-5",
+      "label": "\"No\" → \"That's right\""
+    },
+    {
+      "source": "never-split-the-difference-5",
+      "target": "never-split-the-difference-7",
+      "label": "Agreement → collaboration"
+    },
+    {
+      "source": "never-split-the-difference-6",
+      "target": "never-split-the-difference-9",
+      "label": "Anchors and loss aversion"
+    },
+    {
+      "source": "never-split-the-difference-7",
+      "target": "never-split-the-difference-8",
+      "label": "How questions → execution"
+    },
+    {
+      "source": "never-split-the-difference-8",
+      "target": "never-split-the-difference-9",
+      "label": "Real \"Yes\" → price"
+    },
+    {
+      "source": "never-split-the-difference-9",
+      "target": "never-split-the-difference-10",
+      "label": "Leverage"
+    },
+    {
+      "source": "never-split-the-difference-10",
+      "target": "never-split-the-difference-98",
+      "label": "Black Swans"
+    },
+    {
+      "source": "never-split-the-difference-3",
+      "target": "never-split-the-difference-98",
+      "label": "Accusation audit"
+    },
+    {
+      "source": "never-split-the-difference-7",
+      "target": "never-split-the-difference-98",
+      "label": "Calibrated questions"
+    }
+  ]
+}

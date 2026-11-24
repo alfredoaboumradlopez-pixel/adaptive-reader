@@ -96,6 +96,7 @@ export function chapterTitle(node: EmpireNode): string {
 export function chapterLabel(node: EmpireNode): string {
   const n = chapterNum(node);
   if (n === 0) return "Introducción";
+  if (n === 98) return "Apéndice";
   if (n >= 90) return "Conclusión";
   return `Capítulo ${n}`;
 }
@@ -103,7 +104,7 @@ export function chapterLabel(node: EmpireNode): string {
 /** "Capítulo 2 · Lean AI", or just "Introducción" / "Conclusión". */
 export function chapterHeading(node: EmpireNode): string {
   const n = chapterNum(node);
-  return n === 0 || n >= 90 ? chapterLabel(node) : `${chapterLabel(node)} · ${chapterTitle(node)}`;
+  return n === 0 || n === 99 ? chapterLabel(node) : `${chapterLabel(node)} · ${chapterTitle(node)}`;
 }
 
 export function useLibrary() {
